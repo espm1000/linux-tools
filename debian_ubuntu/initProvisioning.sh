@@ -21,6 +21,7 @@ echo "1 --- Install Basic Deps"
 echo "2 --- Install Dev Tools"
 echo "3 --- Install Docker-CE"
 echo "4 --- Install kubectl"
+echo "5 --- Install TFenv"
 read -rp "Make selection: " selection
 
 install_basic_deps() {
@@ -93,7 +94,7 @@ install_kubectl() {
   FINAL_PATH="/usr/local/bin/"
   echo -e "${GREEN}Installing KubeCTL...${DEFAULT}"
   if ! command -v curl &> /dev/null; then
-    echo -e "${RED}cURL not installed...please install first. ${GREEN}"
+    echo -e "${RED}cURL not installed...please install first. ${DEFAULT}"
     exit 1
   fi
   curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl" || echo "download failed"
@@ -105,6 +106,15 @@ install_kubectl() {
   echo -e "${GREEN}Installation complete.  Update PATH to include '${FINAL_PATH}'"
 }
 
+install_tfenv() {
+  if ! command -v git &> /dev/null; then
+    echo -e "${RED}Git not installed...please install first. ${DEFAULT}"
+    exit 1
+  fi
+  git clone --depth=1 https://github.com/tfutils/tfenv.git ~/.tfenv || echo "install failed"
+  echo -e "${GREEN}Install complete. Set the environment to include '~/.tfenv/bin' ${DEFAULT}"
+}
+
 if [ ${selection} = 1 ]; then
   install_basic_deps
 elif [ ${selection} = 2 ]; then
@@ -113,6 +123,8 @@ elif [ ${selection} = 3 ]; then
   install_docker
 elif [ ${selection} = 4 ]; then
   install_kubectl
+elif [ ${selection} = 5 ]; then
+  install_tfenv
 else
   exit 1
 fi
