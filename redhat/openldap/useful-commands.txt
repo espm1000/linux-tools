@@ -1,0 +1,29 @@
+# Useful Commands
+
+# https://docs.redhat.com/en/documentation/red_hat_directory_server/11/html/administration_guide/examples-of-common-ldapsearches#Examples-of-common-ldapsearches
+
+# Add users/content
+
+ldapadd -x -D cn=admin,dc=example,dc=com -W -f add_content.ldif
+
+# Search Config DN
+
+sudo ldapsearch -Q -LLL -Y EXTERNAL -H ldapi:/// -b cn=config
+
+# Search base DN with admin account
+
+ldapsearch -x -H ldap://localhost -b dc=nyarf,dc=com -D "cn=admin,dc=nyarf,dc=com" -W
+
+# Get info about external user
+
+ldapwhoami -Y EXTERNAL -H ldapi:/// -Q
+
+# Search for (attribute=value)
+
+ldapsearch -x -LLL -b dc=nyarf,dc=com -D "cn=admin,dc=nyarf,dc=com" -W '(uid=nick)'
+
+# Return all entries
+ldapsearch -D "cn=Directory Manager" -W -p 389 -h server.example.com -b "dc=example,dc=com" -s sub -x "(objectclass=*)"
+
+
+ldapsearch -x -LLL -b dc=ccc,dc=local -D "cn=admin,dc=ccc,dc=local" -W

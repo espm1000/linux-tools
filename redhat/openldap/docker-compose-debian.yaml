@@ -1,0 +1,6 @@
+services:
+  debianldap:
+    image: ubuntu:22.04
+    container_name: debian
+    command: >
+        bash -c "sleep 600"

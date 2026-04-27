@@ -1,0 +1,19 @@
+services:
+  wildfly:
+    image: quay.io/wildfly/wildfly:23.0.2.Final
+    ports:
+      - "9990:9990"
+      - "8080:8080"
+      - "8443:8443"
+    volumes:
+      - ./keystore.jks:/opt/jboss/wildfly/standalone/configuration/keystore.jks:z
+    command: >
+      bash -c "/opt/jboss/wildfly/bin/add-user.sh -u 'wadmin' -p 'wadmin' && \
+        /opt/jboss/wildfly/bin/standalone.sh -b 0.0.0.0 -bmanagement 0.0.0.0"
+
+  promootheus:
+    image: prom/prometheus:latest
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./data:/etc/prometheus:Z

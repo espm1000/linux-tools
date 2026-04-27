@@ -1,0 +1,39 @@
+services:
+  ldap:
+    image: osixia/openldap:1.5.0
+    container_name: openldap
+    environment:
+      - LDAP_ORGANISATION=nyarf
+      - LDAP_DOMAIN=nyarf.com
+      - "LDAP_BASE_DN=dc=nyarf,dc=com"
+      - LDAP_ADMIN_PASSWORD={adminpassword}
+      - LDAP_CONFIG_PASSWORD={adminpassword}
+    ports:
+      - 389:389
+      - 636:636
+    volumes:
+      - ./data/slapd/database:/var/lib/ldap
+      - ./data/slapd/config:/etc/ldap/slapd.d
+  
+  db:
+    image: mariadb:latest
+    container_name: mariadb
+    environment:
+      - MARIADB_ROOT_PASSWORD=password
+    ports:
+      - 3306:3306
+  
+  registry:
+    image: registry:2.7
+    ports:
+      - "5000:5000"
+    
+  tester:
+    image: localhost:5000/tester:ubuntu
+    container_name: tester
+    tty: true
+
+    volumes:
+      - type: bind
+        source: ./LDIFs
+        target: /configurations

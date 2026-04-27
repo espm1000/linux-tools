@@ -1,0 +1,9 @@
+# add_index.ldif
+
+dn: olcDatabase={1}mdb,cn=config
+add: olcDbIndex
+olcDbIndex:  smDomainMode5 pres,eq
+
+dn: olcDatabase={1}mdb,cn=config
+add: olcDbIndex
+olcDbIndex:  smRootConfigOID4 pres,eq

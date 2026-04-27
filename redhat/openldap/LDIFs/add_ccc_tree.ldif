@@ -1,0 +1,41 @@
+# add_sample_tree.ldif
+
+dn: ou=ccc,dc=example,dc=org
+ou: ccc
+objectClass: organizationalUnit
+objectClass: top
+
+dn: ou=devops,ou=ccc,dc=example,dc=org
+ou: devops
+objectClass: organizationalUnit
+objectClass: top
+
+dn: uid=dantest,ou=devops,ou=ccc,dc=example,dc=org
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+cn: dantest
+sn: dantest
+ou: devops
+ou: ccc
+
+dn: uid=nick,ou=devops,ou=ccc,dc=example,dc=org
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+cn: nick
+sn: nick
+ou: devops
+ou: ccc
+
+dn: uid=lenah,ou=devops,ou=ccc,dc=example,dc=org
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+cn: lenah
+sn: lenah
+ou: devops
+ou: ccc

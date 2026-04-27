@@ -1,0 +1,12 @@
+#!/bin/bash
+
+set -e
+
+read -rp "Session name: " session_name
+if [ "${session_name}" == "" ]; then
+    echo "Session name required"
+    sleep 1
+    read -rp "Session name: " session_name
+fi
+
+tmux new -s "${session_name}"

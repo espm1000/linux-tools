@@ -1,0 +1,27 @@
+#!/bin/bash
+
+set -e
+
+# Check for docker or podman
+
+if ! command -v podman
+then
+  echo "Podman not found"
+  RT="docker"
+else
+  RT="podman"
+fi
+
+if [[ ! -z ${AWS_ECR_URL} ]]; then
+  ecr_url=${AWS_ECR_URL}
+else
+  read -rp "ECR URL: " ecr_url
+fi
+
+if [[ ! -z ${AWS_REGION} ]]; then
+  aws_region=${AWS_REGION}
+else
+  read -rp "Region: " aws_region
+fi
+
+aws ecr get-login-password --region "${aws_region}" | "${RT}" login --username AWS --password-stdin "${ecr_url}"

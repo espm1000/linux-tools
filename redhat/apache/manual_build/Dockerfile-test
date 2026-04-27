@@ -1,0 +1,10 @@
+FROM ubuntu:24.04
+
+RUN apt update && apt upgrade -y
+
+RUN apt install -y \
+      build-essential
+
+COPY Makefile /scripts/Makefile
+WORKDIR /scripts
+

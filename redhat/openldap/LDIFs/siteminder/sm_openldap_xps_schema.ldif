@@ -1,0 +1,32 @@
+dn: cn=openldap_attribute_xps,cn=schema,cn=config
+changetype: add
+objectClass: olcSchemaConfig
+cn: openldap_attribute_xps
+olcAttributeTypes: ( 1.3.6.1.4.1.2552.1.1.7.1 NAME 'xpsParameter' EQUALITY caseIgnoreMatch ORDERING caseIgnoreOrderingMatch SUBSTR caseIgnoreSubstringsMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 SINGLE-VALUE )
+olcAttributeTypes: ( 1.3.6.1.4.1.2552.1.1.7.2 NAME 'xpsVendor' EQUALITY caseIgnoreMatch ORDERING caseIgnoreOrderingMatch SUBSTR caseIgnoreSubstringsMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 SINGLE-VALUE )
+olcAttributeTypes: ( 1.3.6.1.4.1.2552.1.1.7.3 NAME 'xpsProduct' EQUALITY caseIgnoreMatch ORDERING caseIgnoreOrderingMatch SUBSTR caseIgnoreSubstringsMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 SINGLE-VALUE )
+olcAttributeTypes: ( 1.3.6.1.4.1.2552.1.1.7.4 NAME 'xpsName' EQUALITY caseIgnoreMatch ORDERING caseIgnoreOrderingMatch SUBSTR caseIgnoreSubstringsMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 SINGLE-VALUE )
+olcAttributeTypes: ( 1.3.6.1.4.1.2552.1.1.7.5 NAME 'xpsValue' EQUALITY caseIgnoreMatch ORDERING caseIgnoreOrderingMatch SUBSTR caseIgnoreSubstringsMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 SINGLE-VALUE )
+olcAttributeTypes: ( 1.3.6.1.4.1.2552.1.1.7.6 NAME 'xpsNumber' EQUALITY caseIgnoreMatch ORDERING caseIgnoreOrderingMatch SUBSTR caseIgnoreSubstringsMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 SINGLE-VALUE )
+olcAttributeTypes: ( 1.3.6.1.4.1.2552.1.1.7.7 NAME 'xpsCategory' EQUALITY caseIgnoreMatch ORDERING caseIgnoreOrderingMatch SUBSTR caseIgnoreSubstringsMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 SINGLE-VALUE )
+olcAttributeTypes: ( 1.3.6.1.4.1.2552.1.1.7.8 NAME 'xpsClass' EQUALITY caseIgnoreMatch ORDERING caseIgnoreOrderingMatch SUBSTR caseIgnoreSubstringsMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 SINGLE-VALUE )
+olcAttributeTypes: ( 1.3.6.1.4.1.2552.1.1.7.9 NAME 'xpsParent' EQUALITY caseIgnoreMatch ORDERING caseIgnoreOrderingMatch SUBSTR caseIgnoreSubstringsMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 SINGLE-VALUE )
+olcAttributeTypes: ( 1.3.6.1.4.1.2552.1.1.7.10 NAME 'xpsGUID' EQUALITY caseIgnoreMatch ORDERING caseIgnoreOrderingMatch SUBSTR caseIgnoreSubstringsMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 SINGLE-VALUE )
+olcAttributeTypes: ( 1.3.6.1.4.1.2552.1.1.7.11 NAME 'xpsTombstone' SYNTAX 1.3.6.1.4.1.1466.115.121.1.24 SINGLE-VALUE )
+olcAttributeTypes: ( 1.3.6.1.4.1.2552.1.1.7.12 NAME 'xpsUpdateBy' EQUALITY caseIgnoreMatch ORDERING caseIgnoreOrderingMatch SUBSTR caseIgnoreSubstringsMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 SINGLE-VALUE )
+olcAttributeTypes: ( 1.3.6.1.4.1.2552.1.1.7.13 NAME 'xpsUpdateMethod' EQUALITY caseIgnoreMatch ORDERING caseIgnoreOrderingMatch SUBSTR caseIgnoreSubstringsMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 SINGLE-VALUE )
+olcAttributeTypes: ( 1.3.6.1.4.1.2552.1.1.7.14 NAME 'xpsProperty' EQUALITY caseIgnoreMatch ORDERING caseIgnoreOrderingMatch SUBSTR caseIgnoreSubstringsMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 )
+olcAttributeTypes: ( 1.3.6.1.4.1.2552.1.1.7.15 NAME 'xpsKeyValue' EQUALITY caseIgnoreMatch ORDERING caseIgnoreOrderingMatch SUBSTR caseIgnoreSubstringsMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 SINGLE-VALUE )
+olcAttributeTypes: ( 1.3.6.1.4.1.2552.1.1.7.16 NAME 'xpsXID' EQUALITY caseIgnoreMatch ORDERING caseIgnoreOrderingMatch SUBSTR caseIgnoreSubstringsMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 SINGLE-VALUE )
+olcAttributeTypes: ( 1.3.6.1.4.1.2552.1.1.7.17 NAME 'xpsSortKey' EQUALITY caseIgnoreMatch ORDERING caseIgnoreOrderingMatch SUBSTR caseIgnoreSubstringsMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 SINGLE-VALUE )
+olcAttributeTypes: ( 1.3.6.1.4.1.2552.1.1.7.18 NAME 'xpsIndexedObject' EQUALITY distinguishedNameMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.12 SINGLE-VALUE )
+
+dn: cn=openldap_object_xps,cn=schema,cn=config
+changetype: add
+objectClass: olcSchemaConfig
+cn: openldap_object_xps
+olcObjectClasses: ( 1.3.6.1.4.1.2552.1.1.8.1 NAME 'xpsParameterSetting' SUP top STRUCTURAL MUST ( xpsParameter $ xpsVendor $ xpsProduct $ xpsName ) MAY xpsValue )
+olcObjectClasses: ( 1.3.6.1.4.1.2552.1.1.8.2 NAME 'xpsObject' SUP top STRUCTURAL MUST ( xpsNumber $ xpsCategory $ xpsClass $ xpsGUID $ xpsUpdateBy $ xpsUpdateMethod $ xpsSortKey ) MAY ( xpsParent $ xpsTombstone $ xpsProperty ) )
+olcObjectClasses: ( 1.3.6.1.4.1.2552.1.1.8.3 NAME 'xpsXIDKey' SUP top STRUCTURAL MUST ( xpsXID $ xpsIndexedObject ) )
+olcObjectClasses: ( 1.3.6.1.4.1.2552.1.1.8.4 NAME 'xpsKey' SUP top STRUCTURAL MUST ( xpsKeyValue $ xpsIndexedObject ) )
+

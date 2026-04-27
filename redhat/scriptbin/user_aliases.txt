@@ -1,0 +1,18 @@
+# User Aliases
+alias ls='ls -al'
+alias tf="terraform"
+alias tff="terraform fmt -recursive"
+alias tfp="terraform plan"
+alias tfi="terraform init"
+alias tfaa="terraform apply -auto-approve"
+alias tfdaa="terraform destroy -auto-approve"
+alias tfv="terraform validate"
+alias awsc="aws configure"
+alias awswho="aws sts get-caller-identity"
+alias k="kubectl"
+
+alias tfd="terraform destroy"
+alias myip='curl icanhazip.com'
+alias restartp81='sudo systemctl restart perimeter81helper.service'
+
+alias azwho="az account list"

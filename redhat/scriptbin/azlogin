@@ -1,0 +1,39 @@
+#!/bin/bash
+# shellcheck disable=SC1090
+
+# Simple "wrapper" to login to Azure CLI
+
+set -e
+
+CREDSFILE='.azcreds'
+ACG_AZTENANT='84f1e4ea-8554-43e1-8709-f0b8589ea118'
+
+function get_credentials() {
+  if [[ -e "${CREDSFILE}" ]]; then
+    rm -f "${CREDSFILE}"
+  fi
+  read -rp "Username: " AZ_USERNAME
+  read -rp "Password: " AZ_PASSWORD
+  read -rp "ACG? " IS_ACG
+  if [[ "${IS_ACG}" =~ [Yy] ]]; then
+    AZ_TENANT_ID="${ACG_AZTENANT}"
+  else
+    read -rp "TenantID: " AZ_TENANT_ID
+  fi
+
+  printf "AZ_USERNAME=%s\nAZ_PASSWORD=%s\nAZ_TENANT_ID=%s\n" "${AZ_USERNAME}" "${AZ_PASSWORD}" "${AZ_TENANT_ID}" >> ${CREDSFILE}
+  az login --service-principal --username "${AZ_USERNAME}" --password "${AZ_PASSWORD}" --tenant "${AZ_TENANT_ID}"
+}
+
+case "$1" in
+  --reuse)
+  . "${CREDSFILE}"
+  az login --service-principal --username "${AZ_USERNAME}" --password "${AZ_PASSWORD}" --tenant "${AZ_TENANT_ID}"
+  ;;
+  --reset)
+  rm -f .azcreds
+  ;;
+  *)
+  get_credentials 
+  ;;
+esac

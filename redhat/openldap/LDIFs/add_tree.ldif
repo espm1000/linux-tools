@@ -1,0 +1,21 @@
+# add_tree.ldif
+
+dn: ou=Netegrity,dc=ccc,dc=com
+ou: Netegrity
+objectClass: organizationalUnit
+objectClass: top
+
+dn: ou=Siteminder,ou=Netegrity,dc=ccc,dc=com
+ou: Siteminder
+objectClass: organizationalUnit
+objectClass: top
+
+dn: ou=PolicySvr4,ou=Siteminder,ou=Netegrity,dc=ccc,dc=com
+ou: PolicySvr4
+objectClass: organizationalUnit
+objectClass: top
+
+dn: ou=XPS,ou=PolicySvr4,ou=Siteminder,ou=Netegrity,dc=ccc,dc=com
+ou: XPS
+objectClass: organizationalUnit
+objectClass: top

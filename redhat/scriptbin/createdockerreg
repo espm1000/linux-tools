@@ -1,0 +1,11 @@
+#!/bin/bash
+
+set -e
+
+# Accept $2 as a version string, otherwise set to 'latest'
+VERSION="${2:-latest}"
+
+echo -e "${GREEN}Creating local docker registry${DEFAULT}"
+
+docker pull registry:"${VERSION}"
+docker run -d -p 5000:5000 --name registry registry:"${VERSION}"

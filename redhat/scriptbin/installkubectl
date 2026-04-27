@@ -1,0 +1,47 @@
+#!/bin/bash
+
+set -e
+
+LATESTRELEASE=$(curl -L -s https://dl.k8s.io/release/stable.txt)
+DOWNLOADURL="https://dl.k8s.io/release/${LATESTRELEASE}/bin/linux/amd64/kubectl"
+INSTALLLOC="/usr/local/bin/kubectl"
+
+function get_latest_release() {
+    # Gets the latest Kubectl binary from upstream
+    curl -LO "${DOWNLOADURL}" || echo "failed to download"
+    # Get SHA
+    curl -LO "${DOWNLOADURL}.sha256"
+    # Check signature
+    echo "$(cat kubectl.sha256) kubectl" | sha256sum --check || echo "failed"
+}
+
+function install_kubectl() {
+    # Installs the client
+    echo "Installing Kubectl..."
+    sudo install -o root -g root -m 0755 kubectl ${INSTALLLOC}
+    echo "Done."
+    rm -f kubectl kubectl.sha256
+}
+
+function remove_kubectl() {
+    # Deletes the binary
+    echo "Removing Kubectl binary..."
+    sudo rm -f ${INSTALLLOC}
+    echo "Done."
+}
+
+
+function main() {
+
+    case $1 in
+        --remove)
+        remove_kubectl
+        ;;
+        *)
+        get_latest_release
+        install_kubectl
+        ;;
+    esac
+}
+
+main "$@"

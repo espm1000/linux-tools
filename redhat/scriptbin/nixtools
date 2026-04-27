@@ -1,0 +1,87 @@
+#!/bin/bash
+
+set -e
+
+echo "Welcome to Nix toolset"
+
+function tmuxattach() {
+    read -rp "Session name: " session_name
+    if [[ "${session_name}" == "" ]]; then
+      echo "Session name required"
+      sleep 1
+      read -rp "Session name: " session_name
+    fi
+
+    tmux attach -t "${session_name}"
+}
+
+function tmuxstart() {
+    read -rp "Session name: " session_name
+    if [[ "${session_name}" == "" ]]; then
+        echo "Session name required"
+        sleep 1
+        read -rp "Session name: " session_name
+    fi
+
+    tmux new -s "${session_name}"
+}
+
+function cleantf() {
+    echo "Cleaning terraform folders..."
+    if [[ -d builds/ ]] || [[ -d sec/ ]]; then
+      echo "Temp dirs detected...purging..."
+      rm -rf builds/ sec/
+    fi
+    rm -rf .terraform* terraform.tfstate*
+    echo "Done"
+}
+
+function cleandocker() {
+    echo "Purging all docker things..."
+    docker container prune -f
+    for c in $(docker ps -q); do
+        docker stop "$c"
+    done
+
+    for v in $(docker volume ls -q); do
+        docker volume rm "$v"
+    done
+
+    docker system prune -af
+    docker system df
+}
+
+function help() {
+    echo ""
+    echo "Nixtools"
+    echo ""
+    echo "Argument    ------------ Function"
+    echo "tmuxstart   ------------ Starts a TMUX Session"
+    echo "tmuxattach  ------------ Attaches to existing TMUX session"
+    echo "cleantf     ------------ Cleans temp terraform files in current dir"
+    echo "cleandocker ------------ Purges every docker resource"
+    echo ""
+}
+
+main() {
+    case $1 in
+    tmuxattach)
+        tmuxattach
+      ;;
+    tmuxstart)
+        tmuxstart
+        ;;
+    cleantf)
+        cleantf
+        ;;
+    cleandocker)
+        cleandocker
+        ;;
+    *)
+      echo "Option required"
+      help
+      ;;
+    esac
+}
+
+main "$@"

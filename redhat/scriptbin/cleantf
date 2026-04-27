@@ -1,0 +1,12 @@
+#!/bin/bash
+
+set -e
+
+echo "Cleaning terraform folders..."
+
+if [[ -d builds/ ]] || [[ -d sec/ ]]; then
+  echo "Temp dirs detected... purging..."
+  rm -rf builds/ sec/
+fi
+rm -rf .terraform* terraform.tfstate*
+echo "Done."

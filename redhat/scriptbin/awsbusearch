@@ -1,0 +1,9 @@
+#!/bin/bash
+
+set -e
+
+read -rp "Date(yyyy-mm-dd): " query_date 
+
+echo "Running: aws backup list-recovery-points-by-backup-vault --backup-vault-name aeg-prd-ue1-backups-vault --query RecoveryPoints[?contains(CreationDate, '${query_date}') && contains(ResourceName, 'mssql-standard')].RecoveryPointArn"
+
+aws backup list-recovery-points-by-backup-vault --backup-vault-name aeg-prd-ue1-backups-vault --query "RecoveryPoints[?contains(CreationDate, '${query_date}') && contains(ResourceName, 'mssql-standard')].RecoveryPointArn" --output text

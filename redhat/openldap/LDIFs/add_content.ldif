@@ -1,0 +1,28 @@
+dn: ou=People,dc=nyarf,dc=com
+objectClass: organizationalUnit
+ou: People
+
+dn: ou=Groups,dc=nyarf,dc=com
+objectClass: organizationalUnit
+ou: Groups
+
+dn: cn=platform-linux,ou=Groups,dc=nyarf,dc=com
+objectClass: posixGroup
+cn: platform-linux
+gidNumber: 5000
+memberUid: nick
+
+dn: uid=nick,ou=People,dc=nyarf,dc=com
+objectClass: inetOrgPerson
+objectClass: posixAccount
+objectClass: shadowAccount
+uid: nick
+sn: aspenwall
+givenName: nick
+cn: Nick Aspenwall
+displayName: Nick Aspewnall
+uidNumber: 10000
+gidNumber: 5000
+userPassword: password
+loginShell: /bin/bash
+homeDirectory: /home/nick

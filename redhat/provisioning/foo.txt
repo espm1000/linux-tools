@@ -1,0 +1,17 @@
+  # Custom PS1
+  export PS1='\u@h \W $ '
+
+  # User Aliases
+
+  # Terraform
+  alias tfi="terraform init"
+  alias tff="terraform fmt -recursive"
+  alias tfaa="terraform apply -auto-approve"
+  alias tfdaa="terraform destroy -auto-approve"
+
+  # AWS
+  alias awsc="aws configure"
+  alias awswho="aws sts get-caller-identity"
+
+  # Extend PATH
+  export PATH=/home/nick/.local/bin:/home/nick/bin:/usr/local/bin:/usr/local/sbin:/usr/bin:/usr/sbin:/scriptbin:/.tfenv/bin
