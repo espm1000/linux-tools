@@ -5,11 +5,11 @@ set -e
 echo "Purging all docker things..."
 docker container prune -f
 for c in $(docker ps -q); do
-  docker stop $c;
+  docker stop "$c";
 done
 
 for v in $(docker volume ls -q); do
-  docker volume rm $v
+  docker volume rm "$v"
 done
 
 docker system prune -af

@@ -1,4 +1,5 @@
 #!/bin/bash
+# shellcheck disable=SC2034
 
 # This script will create a key and CSR using OpenSSL
 

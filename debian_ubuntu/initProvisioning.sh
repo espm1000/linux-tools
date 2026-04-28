@@ -31,7 +31,7 @@ if [ "$USER" != 'root' ]; then
   exit 1
 else
   apt update && apt upgrade -y
-  for dep in "${DEP_LIST}"; do
+  for dep in ${DEP_LIST}; do
 	  apt install $dep -y
   done
   echo "alias ls='ls -al'" >> ~/.bashrc
