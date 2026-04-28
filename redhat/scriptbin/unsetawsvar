@@ -15,7 +15,7 @@ if [[ -z ${AWS_SECRET_ACCESS_KEY} ]]; then
 else
   echo -e "${GREEN}Unsetting AWS Variables...${DEFAULT}"
   for key in $(env | grep AWS_ | cut -d= -f1);
-    do unset $key;
+    do unset "$key";
   done
   echo -e "${GREEN}Done.${DEFAULT}"
 fi
