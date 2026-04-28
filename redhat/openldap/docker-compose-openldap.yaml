@@ -24,7 +24,7 @@ services:
       - 3306:3306
   
   registry:
-    image: registry:2.8
+    image: registry:3.1
     ports:
       - "5000:5000"
     
