@@ -2,11 +2,15 @@ package main
 
 import (
 	"bufio"
+	"errors"
 	"log/slog"
 	"os"
 	"runtime"
 	"strings"
 )
+
+var rpmDistros = []string{"fedora", "redhat", "rocky"}
+var debDistros = []string{"ubuntu", "debian"}
 
 func checkOS() (string, error) {
 	os := runtime.GOOS
@@ -38,10 +42,23 @@ func getLinuxDistro() (string, error) {
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
 		line := scanner.Text()
-		s, found := strings.CutPrefix(line, "PRETTY_NAME=")
+		_, found := strings.CutPrefix(line, "PRETTY_NAME=")
+
 		if found {
-			return s, nil
+			switch {
+			case strings.Contains(normalizeString(line), "debian") || strings.Contains(normalizeString(line), "ubuntu"):
+				return "debian", nil
+			case strings.Contains(normalizeString(line), "redhat") || strings.Contains(normalizeString(line), "fedora"):
+				return "redhat", nil
+			default:
+				slog.Error("unable to detect distribution", "response", line)
+				return "", errors.New("no distro detected")
+			}
 		}
 	}
 	return "", nil
+}
+
+func normalizeString(s string) string {
+	return strings.ToLower(s)
 }

@@ -3,9 +3,9 @@
 # Features:
 
 - [ ] OS Checker (Debian / Redhat)
-- [ ] Menu system
 - [ ] Set user environment (bashrc, aliases, prompt)
 - [ ] Install Dependencies
+- [ ] Menu system
 - [ ] Logging
 
 

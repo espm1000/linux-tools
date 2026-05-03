@@ -2,6 +2,6 @@ FROM fedora:latest
 
 RUN dnf update -y
 
-COPY tools.nix /tools/
+COPY tools.dev /tools/
 
 WORKDIR /tools
