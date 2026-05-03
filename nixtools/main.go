@@ -9,6 +9,9 @@ func main() {
 }
 
 func runTools() error {
+	if _, err := checkOS(); err != nil {
+		return err
+	}
 	if err := update_environment_file(); err != nil {
 		return err
 	}

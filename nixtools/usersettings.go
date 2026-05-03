@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"log/slog"
 	"os"
 	"os/user"
@@ -13,6 +14,10 @@ func getCurrentUser() (string, error) {
 	current_user, err := user.Current()
 	if err != nil {
 		return "", err
+	}
+	// Check if running on local machine
+	if current_user.Username == "nick" {
+		return "", errors.New("current user indicates may be running locally...")
 	}
 	slog.Info("detected username", "username", current_user.Username)
 	return current_user.Username, nil
