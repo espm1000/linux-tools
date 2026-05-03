@@ -9,9 +9,6 @@ import (
 	"strings"
 )
 
-var rpmDistros = []string{"fedora", "redhat", "rocky"}
-var debDistros = []string{"ubuntu", "debian"}
-
 func checkOS() (string, error) {
 	os := runtime.GOOS
 	switch os {
