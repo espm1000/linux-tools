@@ -1,5 +1,10 @@
 package main
 
+import "log/slog"
+
 func main() {
-	checkOS()
+	_, err := checkOS()
+	if err != nil {
+		slog.Info("error checking OS")
+	}
 }
