@@ -30,11 +30,10 @@ func getLinuxDistro() (string, error) {
 	if err != nil {
 		return "", err
 	}
-	defer func() error {
+	defer func() {
 		if err := file.Close(); err != nil {
-			return err
+			slog.Error("error closing io stream", "error", err)
 		}
-		return nil
 	}()
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
