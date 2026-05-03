@@ -1,0 +1,7 @@
+FROM fedora:latest
+
+RUN dnf update -y
+
+COPY tools.nix /tools/
+
+WORKDIR /tools

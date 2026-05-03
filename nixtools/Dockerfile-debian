@@ -1,0 +1,7 @@
+FROM debian:latest
+
+RUN apt update && apt upgrade -y
+
+COPY tools.nix /tools/
+
+WORKDIR /tools
