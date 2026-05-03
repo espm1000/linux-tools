@@ -22,6 +22,7 @@ echo "2 --- Install Dev Tools"
 echo "3 --- Install Docker-CE"
 echo "4 --- Install kubectl"
 echo "5 --- Install TFenv"
+echo "6 --- Install GCloud SDK"
 read -rp "Make selection: " selection
 
 install_basic_deps() {
@@ -115,6 +116,25 @@ install_tfenv() {
   echo -e "${GREEN}Install complete. Set the environment to include '~/.tfenv/bin' ${DEFAULT}"
 }
 
+install_google_cli() {
+  google_key_url="https://packages.cloud.google.com/apt/doc/apt-key.gpg"
+  sudo apt update && sudo apt install -y \
+    apt-transport-https \
+    ca-certificates \
+    gnupg \
+    curl
+
+    echo -e "${GREEN}Adding Google GPG Key${DEFAULT}"
+    curl $google_key_url | sudo gpg --dearmor -o /usr/share/keyrings/cloud.google.gpg
+    echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main" | sudo tee -a /etc/apt/sources.list.d/google-cloud-sdk.list
+    echo -e "${GREEN}Done.${DEFAULT}"
+    
+    echo -e "${GREEN}Installing GCloud SDK${DEFAULT}"
+    sudo apt update && sudo apt install -y \
+      google-cloud-cli
+
+}
+
 if [ ${selection} = 1 ]; then
   install_basic_deps
 elif [ ${selection} = 2 ]; then
@@ -125,6 +145,8 @@ elif [ ${selection} = 4 ]; then
   install_kubectl
 elif [ ${selection} = 5 ]; then
   install_tfenv
+elif [ ${selection} = 6 ]; then
+  install_google_cli
 else
   exit 1
 fi
