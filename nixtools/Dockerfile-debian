@@ -1,7 +1,10 @@
 FROM debian:latest
 
 RUN apt update && apt upgrade -y
+RUN useradd -m testuser
 
 COPY tools.dev /tools/
+COPY /internal/templates/bashrc.template /tools/internal/templates/
 
 WORKDIR /tools
+USER testuser

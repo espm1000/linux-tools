@@ -1,10 +1,16 @@
 package main
 
-import "log/slog"
+import "log"
 
 func main() {
-	_, err := checkOS()
-	if err != nil {
-		slog.Info("error checking OS")
+	if err := runTools(); err != nil {
+		log.Fatal(err)
 	}
+}
+
+func runTools() error {
+	if err := update_environment_file(); err != nil {
+		return err
+	}
+	return nil
 }
