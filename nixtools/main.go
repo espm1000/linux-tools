@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 )
 
@@ -20,9 +19,12 @@ func main() {
 }
 
 func generateConfig() (Config, error) {
-	cu, _ := getCurrentUser()
+	cu, err := getCurrentUser()
+	if err != nil {
+		log.Fatal(err)
+	}
 	hostname, _ := getHostname()
-	homeDir, _ := checkEnvironmentFile()
+	homeDir, _ := checkEnvironmentFile(cu)
 
 	return Config{
 		currentUser:  cu,
@@ -37,6 +39,8 @@ func runTools() error {
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Println(cfg)
+	if err := cfg.updateEnvironmentFile(); err != nil {
+		return err
+	}
 	return nil
 }

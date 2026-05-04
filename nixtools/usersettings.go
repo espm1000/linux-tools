@@ -11,22 +11,6 @@ import (
 
 // Everything will assume the shell is BASH
 
-func getConfig() (*Config, error) {
-	current_user, _ := getCurrentUser()
-	user_home_path, err := checkEnvironmentFile()
-	if err != nil {
-		slog.Error("error getting configuration details")
-		return nil, err
-	}
-	hostname, _ := getHostname()
-	return &Config{
-		currentUser:  current_user,
-		homeDiretory: user_home_path,
-		hostname:     hostname,
-	}, nil
-
-}
-
 func getCurrentUser() (string, error) {
 	slog.Info("checking for user settings")
 	current_user, err := user.Current()
@@ -42,36 +26,30 @@ func getCurrentUser() (string, error) {
 	return current_user.Username, nil
 }
 
-func checkEnvironmentFile() (string, error) {
-	cu, err := getCurrentUser()
-	if err != nil {
-		return "", err
-	}
-	slog.Info("detected current user", "user", cu)
-	var userPath = "/home/" + cu
+func checkEnvironmentFile(user string) (string, error) {
+	var userPath = "/home/" + user
 	slog.Info("assuming user path", "path", userPath)
 	if _, err := os.Stat(filepath.Join(userPath, ".bashrc")); err == nil {
 		slog.Info("bash environment file found")
 		return userPath, nil
 	} else {
 		slog.Info("bashrc file not found, creating")
+		if _, err := os.Create(filepath.Join(userPath, ".bashrc")); err != nil {
+			return "", err
+		}
+		slog.Info("done")
 		return "", err
 	}
 }
 
-func updateEnvironmentFile() error {
-	slog.Info("checking for environment file(s)")
-	path, err := checkEnvironmentFile()
-	if err != nil {
-		return err
-	}
-	slog.Info("updating user settings file", "path", path)
+func (c *Config) updateEnvironmentFile() error {
+	slog.Info("updating user settings file", "path", c.homeDiretory)
 	template, err := os.ReadFile("./internal/templates/bashrc.template")
 	if err != nil {
 		return err
 	}
 	slog.Info("reading template file")
-	f, err := os.OpenFile(filepath.Join(path, ".bashrc"), os.O_WRONLY|os.O_APPEND, 0644)
+	f, err := os.OpenFile(filepath.Join(c.homeDiretory, ".bashrc"), os.O_WRONLY|os.O_APPEND, 0644)
 	if err != nil {
 		return err
 	}
