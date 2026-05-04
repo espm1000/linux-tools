@@ -1,6 +1,17 @@
 package main
 
-import "log"
+import (
+	"fmt"
+	"log"
+)
+
+type Config struct {
+	currentUser    string
+	hostname       string
+	homeDiretory   string
+	packageManager string
+	distro         string
+}
 
 func main() {
 	if err := runTools(); err != nil {
@@ -8,15 +19,24 @@ func main() {
 	}
 }
 
+func generateConfig() (Config, error) {
+	cu, _ := getCurrentUser()
+	hostname, _ := getHostname()
+	homeDir, _ := checkEnvironmentFile()
+
+	return Config{
+		currentUser:  cu,
+		hostname:     hostname,
+		homeDiretory: homeDir,
+	}, nil
+
+}
+
 func runTools() error {
-	// if _, err := checkOS(); err != nil {
-	// 	return err
-	// }
-	// if err := update_environment_file(); err != nil {
-	// 	return err
-	// }
-	if err := install_apt_dependencies(); err != nil {
-		return err
+	cfg, err := generateConfig()
+	if err != nil {
+		log.Fatal(err)
 	}
+	fmt.Println(cfg)
 	return nil
 }

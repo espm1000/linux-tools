@@ -2,6 +2,7 @@ package main
 
 import (
 	"errors"
+	_ "log"
 	"log/slog"
 	"os"
 	"os/user"
@@ -10,9 +11,27 @@ import (
 
 // Everything will assume the shell is BASH
 
+func getConfig() (*Config, error) {
+	current_user, _ := getCurrentUser()
+	user_home_path, err := checkEnvironmentFile()
+	if err != nil {
+		slog.Error("error getting configuration details")
+		return nil, err
+	}
+	hostname, _ := getHostname()
+	return &Config{
+		currentUser:  current_user,
+		homeDiretory: user_home_path,
+		hostname:     hostname,
+	}, nil
+
+}
+
 func getCurrentUser() (string, error) {
+	slog.Info("checking for user settings")
 	current_user, err := user.Current()
 	if err != nil {
+		slog.Error("error reading local user", "error", err)
 		return "", err
 	}
 	// Check if running on local machine
@@ -23,13 +42,15 @@ func getCurrentUser() (string, error) {
 	return current_user.Username, nil
 }
 
-func check_for_environment_file() (string, error) {
+func checkEnvironmentFile() (string, error) {
 	cu, err := getCurrentUser()
 	if err != nil {
 		return "", err
 	}
+	slog.Info("detected current user", "user", cu)
 	var userPath = "/home/" + cu
-	if _, err := os.Stat(userPath + "/.bashrc"); err == nil {
+	slog.Info("assuming user path", "path", userPath)
+	if _, err := os.Stat(filepath.Join(userPath, ".bashrc")); err == nil {
 		slog.Info("bash environment file found")
 		return userPath, nil
 	} else {
@@ -38,8 +59,9 @@ func check_for_environment_file() (string, error) {
 	}
 }
 
-func update_environment_file() error {
-	path, err := check_for_environment_file()
+func updateEnvironmentFile() error {
+	slog.Info("checking for environment file(s)")
+	path, err := checkEnvironmentFile()
 	if err != nil {
 		return err
 	}
@@ -65,4 +87,8 @@ func update_environment_file() error {
 		return err
 	}
 	return nil
+}
+
+func getHostname() (string, error) {
+	return os.Hostname()
 }

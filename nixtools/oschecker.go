@@ -18,11 +18,10 @@ func checkOS() (string, error) {
 		if err != nil {
 			return "", err
 		}
-		slog.Info("distro detected", "distro", distro)
+		slog.Info("linux distro detected", "distro", distro)
 	default:
 		slog.Info("failed to detect OS")
 	}
-
 	return os, nil
 }
 
