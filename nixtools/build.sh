@@ -44,7 +44,7 @@ function buildRedhat() {
 function main() {
     buildTool
     buildDebian
-    buildRedhat
+    #buildRedhat
 }
 
 main

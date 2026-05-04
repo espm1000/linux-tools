@@ -22,6 +22,7 @@ func getCurrentUser() (string, error) {
 	slog.Info("detected username", "username", current_user.Username)
 	return current_user.Username, nil
 }
+
 func check_for_environment_file() (string, error) {
 	cu, err := getCurrentUser()
 	if err != nil {
