@@ -10,6 +10,10 @@ RED="\e[31m"
 
 TOOL_FILENAME="tools.dev"
 
+function cleandocker() {
+  ~/bin/cleandocker
+}
+
 function buildTool() {
   if [[ ! -f "${TOOL_FILENAME}" ]]; then
     echo -e "${RED}binary not found, building...${DEFAULT}"
@@ -42,9 +46,16 @@ function buildRedhat() {
 
 
 function main() {
-    buildTool
-    buildDebian
-    #buildRedhat
+    if [[ $1 == "--clean" ]]; then
+      cleandocker
+      buildTool
+      buildDebian
+      #buildRedhat
+    else
+      buildTool
+      buildDebian
+      #buildRedhat
+  fi
 }
 
-main
+main "$@" 
