@@ -4,7 +4,7 @@ COPY . /tools/
 WORKDIR /tools
 RUN go build -o tools.dev .
 
-FROM debian:12
+FROM debian:bookworm-20260421
 RUN apt update && apt install -y sudo
 
 COPY --from=builder /tools/internal/templates/bashrc.template /tools/internal/templates/
