@@ -9,26 +9,28 @@ import (
 	"strings"
 )
 
-func checkOS() (string, error) {
+func checkOS() (*Config, error) {
 	os := runtime.GOOS
 	switch os {
 	case "linux":
 		slog.Info("operating system detected", "os", os)
 		distro, err := getLinuxDistro()
 		if err != nil {
-			return "", err
+			return nil, err
 		}
 		slog.Info("linux distro detected", "distro", distro)
 	default:
 		slog.Info("failed to detect OS")
 	}
-	return os, nil
+	return &Config{
+		os: os,
+	}, nil
 }
 
-func getLinuxDistro() (string, error) {
+func getLinuxDistro() (*Config, error) {
 	file, err := os.Open("/etc/os-release")
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 	defer func() {
 		if err := file.Close(); err != nil {
@@ -43,16 +45,22 @@ func getLinuxDistro() (string, error) {
 		if found {
 			switch {
 			case strings.Contains(normalizeString(line), "debian") || strings.Contains(normalizeString(line), "ubuntu"):
-				return "debian", nil
+				return &Config{
+					packageManager: "apt",
+					distro:         "debian",
+				}, nil
 			case strings.Contains(normalizeString(line), "redhat") || strings.Contains(normalizeString(line), "fedora"):
-				return "redhat", nil
+				return &Config{
+					packageManager: "dnf",
+					distro:         "redhat",
+				}, nil
 			default:
 				slog.Error("unable to detect distribution", "response", line)
-				return "", errors.New("no distro detected")
+				return nil, errors.New("no distro detected")
 			}
 		}
 	}
-	return "", nil
+	return nil, nil
 }
 
 func normalizeString(s string) string {

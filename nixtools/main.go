@@ -2,6 +2,7 @@ package main
 
 import (
 	"log"
+	"os"
 )
 
 type Config struct {
@@ -10,6 +11,7 @@ type Config struct {
 	homeDiretory   string
 	packageManager string
 	distro         string
+	os             string
 }
 
 func main() {
@@ -25,21 +27,32 @@ func generateConfig() (Config, error) {
 	}
 	hostname, _ := getHostname()
 	homeDir, _ := checkEnvironmentFile(cu)
+	cfg, _ := checkOS()
 
 	return Config{
-		currentUser:  cu,
-		hostname:     hostname,
-		homeDiretory: homeDir,
+		currentUser:    cu,
+		hostname:       hostname,
+		homeDiretory:   homeDir,
+		os:             cfg.os,
+		distro:         cfg.distro,
+		packageManager: cfg.packageManager,
 	}, nil
 
 }
 
 func runTools() error {
+	verbose := os.Getenv("NIX_VERBOSE")
+	if verbose == "" {
+		verbose = "false"
+	}
 	cfg, err := generateConfig()
 	if err != nil {
 		log.Fatal(err)
 	}
 	if err := cfg.updateEnvironmentFile(); err != nil {
+		return err
+	}
+	if err := cfg.installAptDependencies(verbose); err != nil {
 		return err
 	}
 	return nil
