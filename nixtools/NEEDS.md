@@ -6,7 +6,7 @@
 - [x] Set user environment (bashrc, aliases, prompt)
 - [x] Install Dependencies
 - [ ] Menu system
-- [ ] Logging
+- [x] Logging
 
 
 DEP_LIST="dos2unix sudo ca-certificates curl gnupg2 git cifs-utils net-tools"
