@@ -8,7 +8,7 @@ import (
 
 func (c *Config) installAptDependencies(verbose string) error {
 	slog.Info("checking for updates")
-	cmd := exec.Command("sudo", "apt", "update", "-y")
+	cmd := exec.Command("sudo", c.packageManager, "update", "-y")
 	if verbose == "true" {
 		cmd.Stdout = os.Stdout
 		cmd.Stderr = os.Stderr

@@ -10,20 +10,23 @@ import (
 )
 
 func checkOS() (*Config, error) {
+	cfg := &Config{}
 	os := runtime.GOOS
 	switch os {
 	case "linux":
 		slog.Info("operating system detected", "os", os)
-		distro, err := getLinuxDistro()
+		config, err := getLinuxDistro()
 		if err != nil {
 			return nil, err
 		}
-		slog.Info("linux distro detected", "distro", distro)
+		cfg = config
 	default:
 		slog.Info("failed to detect OS")
 	}
 	return &Config{
-		os: os,
+		os:             os,
+		distro:         cfg.distro,
+		packageManager: cfg.packageManager,
 	}, nil
 }
 

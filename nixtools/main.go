@@ -2,6 +2,7 @@ package main
 
 import (
 	"log"
+	"log/slog"
 	"os"
 )
 
@@ -47,12 +48,15 @@ func runTools() error {
 	}
 	cfg, err := generateConfig()
 	if err != nil {
+		slog.Error("error occured generating config", "error", cfg)
 		log.Fatal(err)
 	}
 	if err := cfg.updateEnvironmentFile(); err != nil {
+		slog.Error("error occured generating config", "error", cfg)
 		return err
 	}
 	if err := cfg.installAptDependencies(verbose); err != nil {
+		slog.Error("error occured generating config", "error", cfg)
 		return err
 	}
 	return nil
