@@ -1,6 +1,7 @@
 package main
 
 import (
+	menu "linux-tools/nixtools/pkg"
 	"log"
 	"log/slog"
 	"os"
@@ -16,9 +17,15 @@ type Config struct {
 }
 
 func main() {
-	if err := runTools(); err != nil {
-		log.Fatal(err)
-	}
+	// if err := runTools(); err != nil {
+	// 	log.Fatal(err)
+	// }
+	runMenu()
+}
+
+func runMenu() {
+	menu.GenerateApp()
+
 }
 
 func generateConfig() (Config, error) {
