@@ -50,11 +50,11 @@ function main() {
       cleandocker
       buildTool
       buildDebian
-      #buildRedhat
+      buildRedhat
     else
       buildTool
       buildDebian
-      #buildRedhat
+      buildRedhat
   fi
 }
 
