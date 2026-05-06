@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.0](https://github.com/espm1000/linux-tools/compare/v0.2.0...v0.3.0) (2026-05-06)
+
+
+### Features
+
+* **dependency management:** refactor configuration handling and update base images ([#21](https://github.com/espm1000/linux-tools/issues/21)) ([ac1a4ab](https://github.com/espm1000/linux-tools/commit/ac1a4ab49886a4ac58f22760a4ed3d9c8fc6dd92))
+
 ## [0.2.0](https://github.com/espm1000/linux-tools/compare/v0.1.0...v0.2.0) (2026-05-05)
 
 
