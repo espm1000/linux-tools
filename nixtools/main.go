@@ -1,14 +1,16 @@
 package main
 
 import (
-	"fmt"
 	"linux-tools/nixtools/pkg"
 	"log"
 	"log/slog"
 )
 
 func main() {
-	selection := pkg.DisplayMenu()
+	selection, err := pkg.DisplayMenu()
+	if err != nil {
+		log.Fatal(err)
+	}
 	if err := runTools(selection); err != nil {
 		log.Fatal(err)
 	}
