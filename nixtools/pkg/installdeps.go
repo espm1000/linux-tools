@@ -6,15 +6,11 @@ import (
 	"os/exec"
 )
 
-type UpdateConfig struct {
-	packageManager string
-}
-
-func (c *Config) installAptDependencies(verbose string) error {
+func InstallAptDependencies(c *Config) error {
 	slog.Info("installing updates")
 	cmd := exec.Command("sudo", c.packageManager, "update", "-y")
 	cmd.Stdin = os.Stdin
-	if verbose == "true" {
+	if c.verbose {
 		cmd.Stdout = os.Stdout
 	}
 	if err := cmd.Start(); err != nil {

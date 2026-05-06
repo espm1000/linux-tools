@@ -17,6 +17,7 @@ type Config struct {
 	packageManager string
 	distro         string
 	os             string
+	verbose        bool
 }
 
 func GenerateConfig() (*Config, error) {
@@ -48,6 +49,7 @@ func GenerateConfig() (*Config, error) {
 		os:             cfg.os,
 		distro:         cfg.distro,
 		packageManager: cfg.packageManager,
+		verbose:        false,
 	}, nil
 
 }

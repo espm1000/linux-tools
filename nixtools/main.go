@@ -20,5 +20,8 @@ func runTools() error {
 	if err := pkg.UpdateEnvironmentFile(cfg); err != nil {
 		return err
 	}
+	if err := pkg.InstallAptDependencies(cfg); err != nil {
+		return err
+	}
 	return nil
 }
