@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.4.0](https://github.com/espm1000/linux-tools/compare/v0.3.0...v0.4.0) (2026-05-06)
+
+
+### Features
+
+* **menu:** implement menu display and selection handling ([#23](https://github.com/espm1000/linux-tools/issues/23)) ([4947160](https://github.com/espm1000/linux-tools/commit/4947160720ff4e1105a209011bcd137ede3f932a))
+
 ## [0.3.0](https://github.com/espm1000/linux-tools/compare/v0.2.0...v0.3.0) (2026-05-06)
 
 
