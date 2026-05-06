@@ -4,9 +4,6 @@ import (
 	"log/slog"
 	"os"
 	"os/exec"
-	"time"
-
-	"github.com/briandowns/spinner"
 )
 
 type UpdateConfig struct {
@@ -30,8 +27,4 @@ func (c *Config) installAptDependencies(verbose string) error {
 	}
 	slog.Info("complete.")
 	return nil
-}
-
-func initSpinner() *spinner.Spinner {
-	return spinner.New(spinner.CharSets[9], 100*time.Millisecond)
 }
