@@ -21,14 +21,16 @@ func menuText() Menu {
 	return m
 }
 
-func DisplayMenu() string {
+func DisplayMenu() (string, error) {
 	var selection string
 	text := menuText()
 	fmt.Println(text.Line1)
 	fmt.Println(text.Line2)
 	fmt.Println(text.Line3)
 	fmt.Print("Selection: ")
-	fmt.Scan(&selection)
+	if _, err := fmt.Scan(&selection); err != nil {
+		return "", err
+	}
 	time.Sleep(1 * time.Second)
-	return selection
+	return selection, nil
 }

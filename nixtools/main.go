@@ -14,18 +14,6 @@ func main() {
 	}
 }
 
-func routeRequest(s string) error {
-	switch s {
-	case "1":
-		fmt.Println("option 1")
-	case "2":
-		fmt.Println("option 2")
-	case "3":
-		fmt.Println("option 3")
-	}
-	return nil
-}
-
 func runTools(s string) error {
 	switch s {
 	case "1":
