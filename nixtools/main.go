@@ -1,19 +1,9 @@
 package main
 
 import (
+	"linux-tools/nixtools/pkg"
 	"log"
-	"log/slog"
-	"os"
 )
-
-type Config struct {
-	currentUser    string
-	hostname       string
-	homeDiretory   string
-	packageManager string
-	distro         string
-	os             string
-}
 
 func main() {
 	if err := runTools(); err != nil {
@@ -21,42 +11,16 @@ func main() {
 	}
 }
 
-func generateConfig() (Config, error) {
-	cu, err := getCurrentUser()
-	if err != nil {
-		log.Fatal(err)
-	}
-	hostname, _ := getHostname()
-	homeDir, _ := checkEnvironmentFile(cu)
-	cfg, _ := checkOS()
-
-	return Config{
-		currentUser:    cu,
-		hostname:       hostname,
-		homeDiretory:   homeDir,
-		os:             cfg.os,
-		distro:         cfg.distro,
-		packageManager: cfg.packageManager,
-	}, nil
-
-}
-
 func runTools() error {
-	verbose := os.Getenv("NIX_VERBOSE")
-	if verbose == "" {
-		verbose = "false"
-	}
-	cfg, err := generateConfig()
+	// verbose := os.Getenv("NIX_VERBOSE")
+	cfg, err := pkg.GenerateConfig()
 	if err != nil {
-		slog.Error("error occured generating config", "error", cfg)
-		log.Fatal(err)
-	}
-	if err := cfg.updateEnvironmentFile(); err != nil {
-		slog.Error("error occured generating config", "error", cfg)
 		return err
 	}
-	if err := cfg.installAptDependencies(verbose); err != nil {
-		slog.Error("error occured generating config", "error", cfg)
+	if err := pkg.UpdateEnvironmentFile(cfg); err != nil {
+		return err
+	}
+	if err := pkg.InstallAptDependencies(cfg); err != nil {
 		return err
 	}
 	return nil

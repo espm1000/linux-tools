@@ -1,13 +1,73 @@
-package main
+package pkg
 
 import (
 	"bufio"
 	"errors"
 	"log/slog"
 	"os"
+	"os/user"
 	"runtime"
 	"strings"
 )
+
+type Config struct {
+	currentUser    string
+	hostname       string
+	homeDiretory   string
+	packageManager string
+	distro         string
+	os             string
+	verbose        bool
+}
+
+func GenerateConfig() (*Config, error) {
+	cu, err := getCurrentUser()
+	if err != nil {
+		slog.Error("error getting user", "error", err)
+		return nil, err
+	}
+
+	hostname, err := getHostname()
+	if err != nil {
+		return nil, err
+	}
+
+	homeDir, err := checkEnvironmentFile(cu)
+	if err != nil {
+		return nil, err
+	}
+
+	cfg, err := checkOS()
+	if err != nil {
+		return nil, err
+	}
+
+	return &Config{
+		currentUser:    cu,
+		hostname:       hostname,
+		homeDiretory:   homeDir,
+		os:             cfg.os,
+		distro:         cfg.distro,
+		packageManager: cfg.packageManager,
+		verbose:        false,
+	}, nil
+
+}
+
+func getCurrentUser() (string, error) {
+	slog.Info("checking for user settings")
+	current_user, err := user.Current()
+	if err != nil {
+		slog.Error("error reading local user", "error", err)
+		return "", err
+	}
+	// Check if running on local machine
+	if current_user.Username == "nick" {
+		return "", errors.New("current user indicates may be running locally")
+	}
+	slog.Info("detected username", "username", current_user.Username)
+	return current_user.Username, nil
+}
 
 func checkOS() (*Config, error) {
 	cfg := &Config{}
