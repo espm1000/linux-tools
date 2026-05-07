@@ -12,6 +12,7 @@ func main() {
 		log.Fatal(err)
 	}
 	if err := runTools(selection); err != nil {
+		slog.Error("error occured", "error", err)
 		log.Fatal(err)
 	}
 }
@@ -30,7 +31,13 @@ func runTools(s string) error {
 			return err
 		}
 	case "2":
-		slog.Info("option 2 noop")
+		cfg, err := pkg.GenerateConfig()
+		if err != nil {
+			return err
+		}
+		if err = pkg.InstallDevTools(cfg, false); err != nil {
+			return err
+		}
 	case "3":
 		slog.Info("option 3 noop")
 	default:

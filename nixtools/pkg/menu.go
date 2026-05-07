@@ -14,7 +14,7 @@ type Menu struct {
 func menuText() Menu {
 	m := Menu{
 		Line1: "1 --- Run Tool",
-		Line2: "2 --- Generate Configuration Report",
+		Line2: "2 --- Install Dev Tools",
 		Line3: "3 --- Exit",
 	}
 
