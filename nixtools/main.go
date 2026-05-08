@@ -41,7 +41,7 @@ func runTools(s string) error {
 	case "3":
 		slog.Info("option 3 noop")
 	default:
-		slog.Error("option required")
+		pkg.Exit()
 	}
 
 	return nil

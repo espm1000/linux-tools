@@ -8,6 +8,10 @@ import (
 	"os/exec"
 )
 
+type DepConfig struct {
+	DockerURL string
+}
+
 func InstallAptDependencies(c *Config) error {
 	slog.Info("installing updates")
 	cmd := exec.Command("sudo", c.packageManager, "update", "-y")
@@ -48,4 +52,9 @@ func InstallDevTools(c *Config, verbose bool) error {
 		}
 	}
 	return nil
+}
+
+func (c *DepConfig) installDocker() {
+	c.DockerURL = "https://docker.dev"
+
 }

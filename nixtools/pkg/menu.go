@@ -2,6 +2,7 @@ package pkg
 
 import (
 	"fmt"
+	"os"
 	"time"
 )
 
@@ -9,16 +10,15 @@ type Menu struct {
 	Line1 string
 	Line2 string
 	Line3 string
+	Line4 string
 }
 
 func menuText() Menu {
-	m := Menu{
+	return Menu{
 		Line1: "1 --- Run Tool",
-		Line2: "2 --- Install Dev Tools",
+		Line2: "2 --- Install Dev Tools (Debian only)",
 		Line3: "3 --- Exit",
 	}
-
-	return m
 }
 
 func DisplayMenu() (string, error) {
@@ -31,6 +31,10 @@ func DisplayMenu() (string, error) {
 	if _, err := fmt.Scan(&selection); err != nil {
 		return "", err
 	}
-	time.Sleep(1 * time.Second)
+	time.Sleep(500 * time.Millisecond)
 	return selection, nil
+}
+
+func Exit() {
+	os.Exit(0)
 }
