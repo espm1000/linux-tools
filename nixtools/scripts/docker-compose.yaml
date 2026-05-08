@@ -1,0 +1,6 @@
+services:
+  registry:
+    image: registry:latest
+    ports:
+      - "5000:5000"
+    
