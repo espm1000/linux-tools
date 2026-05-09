@@ -12,7 +12,7 @@ TOOL_FILENAME="tools.dev"
 SECONDS=0
 
 function cleandocker() {
-  ~/bin/cleandocker
+  ~/.scriptbin/cleandocker
 }
 
 function buildTool() {
