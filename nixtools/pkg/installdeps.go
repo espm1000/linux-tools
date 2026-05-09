@@ -1,16 +1,17 @@
 package pkg
 
 import (
+	"bufio"
 	"errors"
 	"fmt"
+	"io"
 	"log/slog"
+	"net/http"
 	"os"
 	"os/exec"
 )
 
-type DepConfig struct {
-	DockerURL string
-}
+const dockerKeyRing string = "https://download.docker.com/linux/debian/gpg"
 
 func InstallAptDependencies(c *Config) error {
 	slog.Info("installing updates")
@@ -54,7 +55,59 @@ func InstallDevTools(c *Config, verbose bool) error {
 	return nil
 }
 
-func (c *DepConfig) installDocker() {
-	c.DockerURL = "https://docker.dev"
+func InstallDockerDependencies(c *Config) error {
+	slog.Info("reading packages list")
+	packages, err := os.Open("./internal/templates/package.list")
+	if err != nil {
+		slog.Error("error reading file", "error", err)
+		return err
+	}
+	defer func() error {
+		if err := packages.Close(); err != nil {
+			return err
+		}
+		return nil
+	}()
 
+	scanner := bufio.NewScanner(packages)
+	var cmdList []*exec.Cmd
+	for scanner.Scan() {
+		slog.Info("installing package", "package", scanner.Text())
+		cmd := exec.Command("sudo", c.packageManager, "install", "-y", scanner.Text())
+		cmdList = append(cmdList, cmd)
+	}
+	for _, cmd := range cmdList {
+		if err := cmd.Run(); err != nil {
+			return err
+		}
+	}
+	slog.Info("done.")
+	slog.Info("setting docker apt key")
+	if err := installDockerKeyring(c); err != nil {
+		slog.Error("error", "error", err)
+		return err
+	}
+	return nil
+}
+
+func installDockerKeyring(c *Config) error {
+	if c.distro != "debian" {
+		return nil
+	}
+	outFile, err := os.Create("docker.asc")
+	if err != nil {
+		return err
+	}
+	defer outFile.Close()
+	resp, err := http.Get(dockerKeyRing)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+	_, err = io.Copy(outFile, resp.Body)
+	if err != nil {
+		return err
+	}
+	fmt.Println(outFile)
+	return nil
 }

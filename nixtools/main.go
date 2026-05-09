@@ -18,12 +18,12 @@ func main() {
 }
 
 func runTools(s string) error {
+	cfg, err := pkg.GenerateConfig()
+	if err != nil {
+		return err
+	}
 	switch s {
 	case "1":
-		cfg, err := pkg.GenerateConfig()
-		if err != nil {
-			return err
-		}
 		if err := pkg.UpdateEnvironmentFile(cfg); err != nil {
 			return err
 		}
@@ -31,15 +31,13 @@ func runTools(s string) error {
 			return err
 		}
 	case "2":
-		cfg, err := pkg.GenerateConfig()
-		if err != nil {
-			return err
-		}
 		if err = pkg.InstallDevTools(cfg, false); err != nil {
 			return err
 		}
 	case "3":
-		slog.Info("option 3 noop")
+		if err := pkg.InstallDockerDependencies(cfg); err != nil {
+			return err
+		}
 	default:
 		pkg.Exit()
 	}

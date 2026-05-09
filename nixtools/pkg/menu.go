@@ -17,7 +17,7 @@ func menuText() Menu {
 	return Menu{
 		Line1: "1 --- Run Tool",
 		Line2: "2 --- Install Dev Tools (Debian only)",
-		Line3: "3 --- Exit",
+		Line3: "3 --- Install Docker",
 	}
 }
 
