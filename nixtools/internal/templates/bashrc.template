@@ -21,7 +21,7 @@ alias awsc="aws configure"
 alias awswho="aws sts get-caller-identity"
 
 # Extend PATH
-export PATH=$PATH:/scriptbin:/.tfenv/bin
+export PATH=$PATH:$HOME/.scriptbin:/.tfenv/bin
 
 # User Stuff
 
