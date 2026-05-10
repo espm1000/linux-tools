@@ -1,7 +1,6 @@
 package pkg
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
@@ -21,14 +20,8 @@ type Dependencies struct {
 	DebianDev         []string `json:"debian_dev"`
 }
 
-func loadDependencies() (Dependencies, error) {
-	var deps Dependencies
-	data, err := os.ReadFile("./internal/templates/package_list.json")
-	if err != nil {
-		return deps, err
-	}
-	err = json.Unmarshal(data, &deps)
-	return deps, err
+func loadDependencies() Dependencies {
+	return GetPackageList()
 }
 
 func InstallAptDependencies(c *Config) error {
@@ -56,10 +49,7 @@ func InstallDevTools(c *Config, verbose bool) error {
 		return errors.New("invalid OS")
 	}
 	var cmdList []exec.Cmd
-	deps, err := loadDependencies()
-	if err != nil {
-		return err
-	}
+	deps := loadDependencies()
 	for _, dep := range deps.DebianDev {
 		cmd := exec.Command("sudo", c.packageManager, "install", "-y", dep)
 		cmdList = append(cmdList, *cmd)
@@ -102,10 +92,7 @@ func installDockerDebian(c *Config) error {
 		return errors.New("non-root user")
 	}
 	slog.Info("reading packages list")
-	deps, err := loadDependencies()
-	if err != nil {
-		return err
-	}
+	deps := loadDependencies()
 
 	for _, dep := range deps.BasicDependencies {
 		slog.Info("preparing to install dependency", "package", dep)
@@ -129,7 +116,7 @@ func installDockerDebian(c *Config) error {
 	if err := writeDockerAptSource(c); err != nil {
 		return err
 	}
-	if err = InstallAptDependencies(c); err != nil {
+	if err := InstallAptDependencies(c); err != nil {
 		return err
 	}
 	for _, dep := range deps.Docker {
