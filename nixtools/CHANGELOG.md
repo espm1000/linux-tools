@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.5.0](https://github.com/espm1000/linux-tools/compare/v0.4.0...v0.5.0) (2026-05-10)
+
+
+### Features
+
+* **installdeps:** add InstallDevTools function for dependency installation ([faa8a20](https://github.com/espm1000/linux-tools/commit/faa8a20e69d39564035c5f1abc6839efb9cf6e39))
+* **menu:** add more tooling and docker install for debian ([#25](https://github.com/espm1000/linux-tools/issues/25)) ([faa8a20](https://github.com/espm1000/linux-tools/commit/faa8a20e69d39564035c5f1abc6839efb9cf6e39))
+
 ## [0.4.0](https://github.com/espm1000/linux-tools/compare/v0.3.0...v0.4.0) (2026-05-06)
 
 
