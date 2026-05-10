@@ -141,12 +141,24 @@ func installDockerKeyringDebian(c *Config) error {
 	if err != nil {
 		return err
 	}
-	defer outFile.Close()
+	defer func() error {
+		if err := outFile.Close(); err != nil {
+			return err
+		}
+		return nil
+	}()
 	resp, err := http.Get(dockerKeyRing)
 	if err != nil {
 		return err
 	}
-	defer resp.Body.Close()
+
+	defer func() error {
+		if err := resp.Body.Close(); err != nil {
+			return err
+		}
+		return nil
+	}()
+
 	_, err = io.Copy(outFile, resp.Body)
 	if err != nil {
 		return err
