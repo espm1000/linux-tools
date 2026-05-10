@@ -74,7 +74,7 @@ func GenerateConfig() (*Config, error) {
 		verbose:        false,
 		OSInfo: &OSInfo{
 			VersionInfo: version,
-			Arch: arch,
+			Arch:        strings.Replace(arch, "\n", "", 1),
 		},
 	}, nil
 

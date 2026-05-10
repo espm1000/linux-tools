@@ -1,7 +1,7 @@
 package pkg
 
 import (
-	"bufio"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
@@ -13,6 +13,22 @@ import (
 
 const dockerKeyRing string = "https://download.docker.com/linux/debian/gpg"
 const dockerKey string = "/etc/apt/keyrings/docker.asc"
+const dockerRepo string = "/etc/apt/sources.list.d/docker.sources"
+
+type Dependencies struct {
+	BasicDependencies []string `json:"basic_dependencies"`
+	Docker            []string `json:"docker"`
+}
+
+func loadDependencies() (Dependencies, error) {
+	var deps Dependencies
+	data, err := os.ReadFile("./internal/templates/package_list.json")
+	if err != nil {
+		return deps, err
+	}
+	err = json.Unmarshal(data, &deps)
+	return deps, err
+}
 
 func InstallAptDependencies(c *Config) error {
 	slog.Info("installing updates")
@@ -74,30 +90,24 @@ func InstallDocker(c *Config) error {
 }
 
 func installDockerDebian(c *Config) error {
+	var cmdList []*exec.Cmd
+	var dockerCmdList []*exec.Cmd
 	if c.currentUser != "root" {
 		slog.Error("user must be root to install docker")
 		return errors.New("non-root user")
 	}
 	slog.Info("reading packages list")
-	packages, err := os.Open("./internal/templates/package.list")
+	deps, err := loadDependencies()
 	if err != nil {
-		slog.Error("error reading file", "error", err)
 		return err
 	}
-	defer func() error {
-		if err := packages.Close(); err != nil {
-			return err
-		}
-		return nil
-	}()
 
-	scanner := bufio.NewScanner(packages)
-	var cmdList []*exec.Cmd
-	for scanner.Scan() {
-		slog.Info("installing package", "package", scanner.Text())
-		cmd := exec.Command("sudo", c.packageManager, "install", "-y", scanner.Text())
+	for _, dep := range deps.BasicDependencies {
+		slog.Info("preparing to install dependency", "package", dep)
+		cmd := exec.Command("sudo", c.packageManager, "install", "-y", dep)
 		cmdList = append(cmdList, cmd)
 	}
+
 	for _, cmd := range cmdList {
 		if err := cmd.Run(); err != nil {
 			return err
@@ -112,6 +122,19 @@ func installDockerDebian(c *Config) error {
 	slog.Info("adding docker apt repository")
 	if err := writeDockerAptSource(c); err != nil {
 		return err
+	}
+	if err = InstallAptDependencies(c); err != nil {
+		return err
+	}
+	for _, dep := range deps.Docker {
+		slog.Info("preparing to install dependency", "package", dep)
+		cmd := exec.Command("sudo", c.packageManager, "install", "-y", dep)
+		dockerCmdList = append(dockerCmdList, cmd)
+	}
+	for _, cmd := range dockerCmdList {
+		if err := cmd.Run(); err != nil {
+			return err
+		}
 	}
 	return nil
 }
@@ -138,17 +161,17 @@ func installDockerKeyringDebian(c *Config) error {
 }
 
 func writeDockerAptSource(c *Config) error {
-	tmpl, err := os.ReadFile("./internal/templates/docker.repo")
-	if err != nil {
-		slog.Error("error reading file", "error", err)
-		return err
-	}
-	updated := fmt.Sprintf(string(tmpl), c.OSInfo.VersionInfo, c.OSInfo.Arch, dockerKey)
-	err = os.WriteFile(string(tmpl), []byte(updated), 0644)
+	content := `Types: deb
+URIs: https://download.docker.com/linux/debian
+Suites: %s
+Components: stable
+Architectures: %s
+Signed-By: %s`
+	updated := fmt.Sprintf(content, c.OSInfo.VersionInfo, c.OSInfo.Arch, dockerKey)
+	err := os.WriteFile(dockerRepo, []byte(updated), 0644)
 	if err != nil {
 		return err
 	}
 
-	fmt.Println(updated)
 	return nil
 }
