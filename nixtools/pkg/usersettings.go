@@ -7,6 +7,10 @@ import (
 	"path/filepath"
 )
 
+type UserConfig struct {
+	Config Config
+}
+
 // Everything will assume the shell is BASH
 
 func checkEnvironmentFile(user string) (string, error) {

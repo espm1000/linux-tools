@@ -9,9 +9,10 @@ RED="\e[31m"
 
 
 TOOL_FILENAME="tools.dev"
+SECONDS=0
 
 function cleandocker() {
-  ~/bin/cleandocker
+  ~/.scriptbin/cleandocker
 }
 
 function buildTool() {
@@ -59,3 +60,4 @@ function main() {
 }
 
 main "$@" 
+echo -e "${GREEN}Elapsed time: $SECONDS seconds.${DEFAULT}"

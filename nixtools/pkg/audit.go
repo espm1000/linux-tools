@@ -3,14 +3,24 @@ package pkg
 import (
 	"bufio"
 	"errors"
+	"fmt"
 	"log/slog"
 	"os"
+	"os/exec"
 	"os/user"
 	"runtime"
 	"strings"
 )
 
+const osRelease string = "/etc/os-release"
+
+type OSInfo struct {
+	VersionInfo string
+	Arch        string
+}
+
 type Config struct {
+	OSInfo         *OSInfo
 	currentUser    string
 	hostname       string
 	homeDiretory   string
@@ -32,12 +42,24 @@ func GenerateConfig() (*Config, error) {
 		return nil, err
 	}
 
-	homeDir, err := checkEnvironmentFile(cu)
+	var homeDir string
+	if cu != "root" {
+		homeDir, err = checkEnvironmentFile(cu)
+		if err != nil {
+			return nil, err
+		}
+	}
+	cfg, err := checkOS()
 	if err != nil {
 		return nil, err
 	}
 
-	cfg, err := checkOS()
+	version, err := getOSDetails()
+	if err != nil {
+		return nil, err
+	}
+
+	arch, err := getArch(cfg)
 	if err != nil {
 		return nil, err
 	}
@@ -50,6 +72,10 @@ func GenerateConfig() (*Config, error) {
 		distro:         cfg.distro,
 		packageManager: cfg.packageManager,
 		verbose:        false,
+		OSInfo: &OSInfo{
+			VersionInfo: version,
+			Arch:        strings.Replace(arch, "\n", "", 1),
+		},
 	}, nil
 
 }
@@ -91,7 +117,7 @@ func checkOS() (*Config, error) {
 }
 
 func getLinuxDistro() (*Config, error) {
-	file, err := os.Open("/etc/os-release")
+	file, err := os.Open(osRelease)
 	if err != nil {
 		return nil, err
 	}
@@ -124,6 +150,42 @@ func getLinuxDistro() (*Config, error) {
 		}
 	}
 	return nil, nil
+}
+
+func parseOSReleaseDetails(key string) (string, error) {
+	data, err := os.ReadFile(osRelease)
+	if err != nil {
+		return "", err
+	}
+	prefix := key + "="
+
+	for _, line := range strings.Split(string(data), "\n") {
+		line = strings.TrimSpace(line)
+		if strings.HasPrefix(line, prefix) {
+			value := strings.TrimPrefix(line, prefix)
+			return strings.Trim(value, `"'`), nil
+		}
+	}
+	return "", fmt.Errorf("%s not found", prefix)
+}
+
+func getOSDetails() (string, error) {
+	version, err := parseOSReleaseDetails("VERSION_CODENAME")
+	if err != nil {
+		return "", err
+	}
+	return version, nil
+}
+
+func getArch(c *Config) (string, error) {
+	if c.distro == "debian" {
+		arch, err := exec.Command("dpkg", "--print-architecture").Output()
+		if err != nil {
+			return "", err
+		}
+		return string(arch), nil
+	}
+	return "unknown", nil
 }
 
 func normalizeString(s string) string {
