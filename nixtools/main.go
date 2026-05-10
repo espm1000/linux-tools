@@ -1,6 +1,8 @@
 package main
 
 import (
+	"encoding/json"
+	"fmt"
 	"linux-tools/nixtools/pkg"
 	"log"
 	"log/slog"
@@ -19,6 +21,8 @@ func main() {
 
 func runTools(s string) error {
 	cfg, err := pkg.GenerateConfig()
+	pretty, _ := json.Marshal(cfg)
+	fmt.Println(string(pretty))
 	if err != nil {
 		return err
 	}
@@ -35,7 +39,7 @@ func runTools(s string) error {
 			return err
 		}
 	case "3":
-		if err := pkg.InstallDockerDependencies(cfg); err != nil {
+		if err := pkg.InstallDocker(cfg); err != nil {
 			return err
 		}
 	default:

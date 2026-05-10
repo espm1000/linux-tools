@@ -12,6 +12,7 @@ import (
 )
 
 const dockerKeyRing string = "https://download.docker.com/linux/debian/gpg"
+const dockerKey string = "/etc/apt/keyrings/docker.asc"
 
 func InstallAptDependencies(c *Config) error {
 	slog.Info("installing updates")
@@ -55,7 +56,28 @@ func InstallDevTools(c *Config, verbose bool) error {
 	return nil
 }
 
-func InstallDockerDependencies(c *Config) error {
+func InstallDocker(c *Config) error {
+	// Determine OS
+	switch c.distro {
+	case "debian":
+		if err := installDockerDebian(c); err != nil {
+			return err
+		}
+		return nil
+	case "redhat":
+		//installDockerRedhat(c)
+		return nil
+	default:
+		fmt.Println("unknown OS")
+	}
+	return nil
+}
+
+func installDockerDebian(c *Config) error {
+	if c.currentUser != "root" {
+		slog.Error("user must be root to install docker")
+		return errors.New("non-root user")
+	}
 	slog.Info("reading packages list")
 	packages, err := os.Open("./internal/templates/package.list")
 	if err != nil {
@@ -83,18 +105,22 @@ func InstallDockerDependencies(c *Config) error {
 	}
 	slog.Info("done.")
 	slog.Info("setting docker apt key")
-	if err := installDockerKeyring(c); err != nil {
+	if err := installDockerKeyringDebian(c); err != nil {
 		slog.Error("error", "error", err)
+		return err
+	}
+	slog.Info("adding docker apt repository")
+	if err := writeDockerAptSource(c); err != nil {
 		return err
 	}
 	return nil
 }
 
-func installDockerKeyring(c *Config) error {
+func installDockerKeyringDebian(c *Config) error {
 	if c.distro != "debian" {
-		return nil
+		return fmt.Errorf("unsupported OS: %s", c.distro)
 	}
-	outFile, err := os.Create("docker.asc")
+	outFile, err := os.OpenFile(dockerKey, os.O_CREATE|os.O_WRONLY, 0644)
 	if err != nil {
 		return err
 	}
@@ -108,6 +134,21 @@ func installDockerKeyring(c *Config) error {
 	if err != nil {
 		return err
 	}
-	fmt.Println(outFile)
+	return nil
+}
+
+func writeDockerAptSource(c *Config) error {
+	tmpl, err := os.ReadFile("./internal/templates/docker.repo")
+	if err != nil {
+		slog.Error("error reading file", "error", err)
+		return err
+	}
+	updated := fmt.Sprintf(string(tmpl), c.OSInfo.VersionInfo, c.OSInfo.Arch, dockerKey)
+	err = os.WriteFile(string(tmpl), []byte(updated), 0644)
+	if err != nil {
+		return err
+	}
+
+	fmt.Println(updated)
 	return nil
 }
