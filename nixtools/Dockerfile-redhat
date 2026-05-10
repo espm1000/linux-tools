@@ -6,8 +6,7 @@ RUN go build -o tools.dev .
 
 FROM fedora:latest
 
-COPY --from=builder /tools/internal/templates/bashrc.template /tools/internal/templates/bashrc.template
-COPY --from=builder /tools/internal/templates/package.list /tools/internal/templates/
+COPY --from=builder /tools/internal/templates/ /tools/internal/templates/
 COPY --from=builder /tools/tools.dev /tools/tools.dev
 ENV NIX_VERBOSE="true"
 RUN useradd -m testuser
