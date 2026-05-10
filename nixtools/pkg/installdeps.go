@@ -18,6 +18,7 @@ const dockerRepo string = "/etc/apt/sources.list.d/docker.sources"
 type Dependencies struct {
 	BasicDependencies []string `json:"basic_dependencies"`
 	Docker            []string `json:"docker"`
+	DebianDev         []string `json:"debian_dev"`
 }
 
 func loadDependencies() (Dependencies, error) {
@@ -55,13 +56,16 @@ func InstallDevTools(c *Config, verbose bool) error {
 		return errors.New("invalid OS")
 	}
 	var cmdList []exec.Cmd
-	deps := []string{"build-essential", "checkinstall", "libz-dev", "dh-make", "libssl-dev", "devscripts"}
-	for _, dep := range deps {
+	deps, err := loadDependencies()
+	if err != nil {
+		return err
+	}
+	for _, dep := range deps.DebianDev {
 		cmd := exec.Command("sudo", c.packageManager, "install", "-y", dep)
 		cmdList = append(cmdList, *cmd)
 	}
 	for _, c := range cmdList {
-		fmt.Printf("installing update %v\n", c.Args[4])
+		slog.Info("installing dependency", "package", c.Args[4])
 		if verbose {
 			c.Stderr = os.Stderr
 		}
@@ -82,6 +86,7 @@ func InstallDocker(c *Config) error {
 		return nil
 	case "redhat":
 		//installDockerRedhat(c)
+		slog.Info("redhat currently noop")
 		return nil
 	default:
 		fmt.Println("unknown OS")
@@ -109,6 +114,7 @@ func installDockerDebian(c *Config) error {
 	}
 
 	for _, cmd := range cmdList {
+		slog.Info("installing dependency", "package", cmd.Args[4])
 		if err := cmd.Run(); err != nil {
 			return err
 		}
@@ -132,6 +138,7 @@ func installDockerDebian(c *Config) error {
 		dockerCmdList = append(dockerCmdList, cmd)
 	}
 	for _, cmd := range dockerCmdList {
+		slog.Info("installing dependency", "package", cmd.Args[4])
 		if err := cmd.Run(); err != nil {
 			return err
 		}
