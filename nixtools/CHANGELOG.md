@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.6.0](https://github.com/espm1000/linux-tools/compare/v0.5.0...v0.6.0) (2026-05-11)
+
+
+### Features
+
+* **menu:** add option to generate templates and update menu display ([6e001f2](https://github.com/espm1000/linux-tools/commit/6e001f2761f0487ed1905b386b52cac397b574a4))
+
+
+### Bug Fixes
+
+* **NEEDS.md:** correct checkbox status for Menu system and Logging ([e1bcea5](https://github.com/espm1000/linux-tools/commit/e1bcea5eed91f5d48f4d6eb6d6c17a1d8ec0f9a7))
+* **templates:** add 'vim' to BasicDependencies in GetPackageList ([42ecef7](https://github.com/espm1000/linux-tools/commit/42ecef765b6a4efe29c76dbf439aa2b435553824))
+
 ## [0.5.0](https://github.com/espm1000/linux-tools/compare/v0.4.0...v0.5.0) (2026-05-10)
 
 
