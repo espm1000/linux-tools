@@ -1,6 +1,0 @@
-Types: deb
-URIs: https://download.docker.com/linux/debian
-Suites: %s
-Components: stable
-Architectures: %s
-Signed-By: %s
