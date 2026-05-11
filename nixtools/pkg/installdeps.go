@@ -15,19 +15,44 @@ const dockerKey string = "/etc/apt/keyrings/docker.asc"
 const dockerRepo string = "/etc/apt/sources.list.d/docker.sources"
 
 type Dependencies struct {
-	BasicDependencies []string `json:"basic_dependencies"`
-	Docker            []string `json:"docker"`
-	DebianDev         []string `json:"debian_dev"`
+	InitialDependencies []string
+	BasicDependencies   []string
+	Docker              []string
+	DebianDev           []string
 }
 
 func loadDependencies() Dependencies {
 	return GetPackageList()
 }
 
-func InstallAptDependencies(c *Config) error {
+func InstallInitialDebianDependencies(c *Config) error {
+	// This needs to be run as root; check if user is root
+	slog.Info("installing initial dependencies for new debian system")
+	if c.currentUser != "root" {
+		slog.Error("user must be root")
+		return errors.New("user must be root")
+	}
+	var cmdList []*exec.Cmd
+	deps := loadDependencies()
+	for _, dep := range deps.InitialDependencies {
+		cmd := exec.Command(c.packageManager, "install", "-y", dep)
+		cmdList = append(cmdList, cmd)
+	}
+	for _, cmd := range cmdList {
+		if err := cmd.Run(); err != nil {
+			return err
+		}
+	}
+	slog.Info("done")
+	return nil
+}
+
+func InstallDependencies(c *Config) error {
 	slog.Info("installing updates")
 	cmd := exec.Command("sudo", c.packageManager, "update", "-y")
 	cmd.Stdin = os.Stdin
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
 	if c.verbose {
 		cmd.Stdout = os.Stdout
 	}
@@ -116,7 +141,7 @@ func installDockerDebian(c *Config) error {
 	if err := writeDockerAptSource(c); err != nil {
 		return err
 	}
-	if err := InstallAptDependencies(c); err != nil {
+	if err := InstallDependencies(c); err != nil {
 		return err
 	}
 	for _, dep := range deps.Docker {

@@ -87,10 +87,6 @@ func getCurrentUser() (string, error) {
 		slog.Error("error reading local user", "error", err)
 		return "", err
 	}
-	// Check if running on local machine
-	if current_user.Username == "nick" {
-		return "", errors.New("current user indicates may be running locally")
-	}
 	slog.Info("detected username", "username", current_user.Username)
 	return current_user.Username, nil
 }
