@@ -38,6 +38,10 @@ func runTools(s string) error {
 		if err := pkg.InstallDocker(cfg); err != nil {
 			return err
 		}
+	case "4":
+		if err := pkg.GenerateTemplates(cfg); err != nil {
+			return err
+		}
 	default:
 		pkg.Exit()
 	}

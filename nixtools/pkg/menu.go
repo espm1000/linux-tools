@@ -18,6 +18,7 @@ func menuText() Menu {
 		Line1: "1 --- Run Tool",
 		Line2: "2 --- Install Dev Tools (Debian only)",
 		Line3: "3 --- Install Docker",
+		Line4: "4 --- Generate Templates",
 	}
 }
 
@@ -27,6 +28,7 @@ func DisplayMenu() (string, error) {
 	fmt.Println(text.Line1)
 	fmt.Println(text.Line2)
 	fmt.Println(text.Line3)
+	fmt.Println(text.Line4)
 	fmt.Print("Selection: ")
 	if _, err := fmt.Scan(&selection); err != nil {
 		return "", err
