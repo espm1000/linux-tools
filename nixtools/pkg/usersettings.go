@@ -30,25 +30,7 @@ func checkEnvironmentFile(user string) (string, error) {
 }
 
 func UpdateEnvironmentFile(c *Config) error {
-	slog.Info("updating user settings file", "path", c.homeDiretory)
-	template, err := os.ReadFile("./internal/templates/bashrc.template")
-	if err != nil {
-		return err
-	}
-	slog.Info("reading template file")
-	f, err := os.OpenFile(filepath.Join(c.homeDiretory, ".bashrc"), os.O_WRONLY|os.O_APPEND, 0644)
-	if err != nil {
-		return err
-	}
-	defer func() {
-		if err := f.Close(); err != nil {
-			slog.Error("error closing file", "error", err)
-		}
-	}()
-	sTemplate := string(template)
-	slog.Debug("template contents", "contents", sTemplate)
-	if _, err := f.WriteString(sTemplate); err != nil {
-		slog.Error("error writing to environment file", "error", err)
+	if err := GenerateTemplates(c); err != nil {
 		return err
 	}
 	return nil
