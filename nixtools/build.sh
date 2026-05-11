@@ -47,16 +47,27 @@ function buildRedhat() {
 
 
 function main() {
-    if [[ $1 == "--clean" ]]; then
+  case $1 in
+    --clean)
       cleandocker
-      buildTool
+    ;;
+    --debian)
       buildDebian
+    ;;
+    --redhat)
       buildRedhat
-    else
-      buildTool
+    ;;
+    --all)
+      buildRedhat
       buildDebian
-      buildRedhat
-  fi
+    ;;
+    --local)
+      buildTool
+    ;;
+    *)
+      echo "build tool"
+    ;;
+  esac
 }
 
 main "$@" 
