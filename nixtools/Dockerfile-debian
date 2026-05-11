@@ -7,7 +7,6 @@ RUN go build -o tools.dev .
 FROM debian:trixie-slim
 RUN apt update && apt install -y sudo
 
-COPY --from=builder /tools/internal/templates/ /tools/internal/templates/
 COPY --from=builder /tools/tools.dev /tools/tools.dev
 
 RUN useradd -m testuser

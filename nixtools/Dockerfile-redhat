@@ -6,9 +6,8 @@ RUN go build -o tools.dev .
 
 FROM fedora:latest
 
-COPY --from=builder /tools/internal/templates/ /tools/internal/templates/
 COPY --from=builder /tools/tools.dev /tools/tools.dev
-ENV NIX_VERBOSE="true"
+
 RUN useradd -m testuser
 RUN usermod -aG wheel testuser
 RUN echo "testuser:p" | chpasswd
