@@ -32,18 +32,36 @@ func InstallInitialDebianDependencies(c *Config) error {
 		slog.Error("user must be root")
 		return errors.New("user must be root")
 	}
+	var linuxUser string
 	var cmdList []*exec.Cmd
 	deps := loadDependencies()
+	slog.Info("refreshing package manager", "package_manager", c.packageManager)
+	if err := exec.Command(c.packageManager, "update").Run(); err != nil {
+		return err
+	}
 	for _, dep := range deps.InitialDependencies {
+		slog.Info("installing dependency", "package", dep)
 		cmd := exec.Command(c.packageManager, "install", "-y", dep)
+		cmd.Stdout = os.Stdout
+		cmd.Stdin = os.Stdin
 		cmdList = append(cmdList, cmd)
 	}
 	for _, cmd := range cmdList {
 		if err := cmd.Run(); err != nil {
+			slog.Error("error running install", "error", err)
 			return err
 		}
 	}
 	slog.Info("done")
+	fmt.Print("what is your linux username? ")
+	if _, err := fmt.Scan(&linuxUser); err != nil {
+		slog.Error("error capturing username")
+		return err
+	}
+	slog.Info("adding user to sudoers file", "user", linuxUser)
+	if _, err := exec.Command("usermod", "-aG", "sudo", linuxUser).Output(); err != nil {
+		return err
+	}
 	return nil
 }
 
