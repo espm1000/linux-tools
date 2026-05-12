@@ -59,9 +59,10 @@ func InstallInitialDebianDependencies(c *Config) error {
 		return err
 	}
 	slog.Info("adding user to sudoers file", "user", linuxUser)
-	if _, err := exec.Command("usermod", "-aG", "sudo", linuxUser).Output(); err != nil {
+	if _, err := exec.Command("sudo", "usermod", "-aG", "sudo", linuxUser).Output(); err != nil {
 		return err
 	}
+	slog.Info("done. reboot or relog into the workstation")
 	return nil
 }
 
@@ -173,6 +174,7 @@ func installDockerDebian(c *Config) error {
 			return err
 		}
 	}
+	slog.Info("docker installation complete. add user to docker group.")
 	return nil
 }
 
