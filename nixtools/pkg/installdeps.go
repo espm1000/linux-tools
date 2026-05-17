@@ -25,7 +25,7 @@ func loadDependencies() Dependencies {
 	return GetPackageList()
 }
 
-func InstallInitialDebianDependencies(c *Config, verbose bool) error {
+func InstallInitialDebianDependencies(c *Config) error {
 	// This needs to be run as root; check if user is root
 	slog.Info("installing initial dependencies for new debian system")
 	if c.currentUser != "root" {
@@ -42,7 +42,7 @@ func InstallInitialDebianDependencies(c *Config, verbose bool) error {
 	for _, dep := range deps.InitialDependencies {
 		slog.Info("installing dependency", "package", dep)
 		cmd := exec.Command(c.packageManager, "install", "-y", dep)
-		if verbose {
+		if c.verbose {
 			cmd.Stdout = os.Stdout
 			cmd.Stdin = os.Stdin
 		}
@@ -68,10 +68,10 @@ func InstallInitialDebianDependencies(c *Config, verbose bool) error {
 	return nil
 }
 
-func InstallDependencies(c *Config, verbose bool) error {
+func InstallDependencies(c *Config) error {
 	slog.Info("installing updates")
-	update := exec.Command("sudo", c.packageManager, "update")
-	if verbose {
+	update := exec.Command("sudo", c.packageManager, "update", "-y")
+	if c.verbose {
 		update.Stdout = os.Stdout
 		update.Stderr = os.Stderr
 		update.Stdin = os.Stdin
@@ -80,20 +80,23 @@ func InstallDependencies(c *Config, verbose bool) error {
 		slog.Error("error running update command", "error", err)
 		return err
 	}
-	upgrade := exec.Command("sudo", c.packageManager, "upgrade", "-y")
-	if verbose {
-		upgrade.Stdout = os.Stdout
-		upgrade.Stderr = os.Stderr
-		upgrade.Stdin = os.Stdin
-	}
-	if err := upgrade.Run(); err != nil {
-		slog.Error("error running upgrade command", "error", err)
+	if c.packageManager == "apt" {
+		slog.Info("running apt upgrade command")
+		upgrade := exec.Command("sudo", c.packageManager, "upgrade", "-y")
+		if c.verbose {
+			upgrade.Stdout = os.Stdout
+			upgrade.Stderr = os.Stderr
+			upgrade.Stdin = os.Stdin
+		}
+		if err := upgrade.Run(); err != nil {
+			slog.Error("error running upgrade command", "error", err)
+		}
 	}
 	slog.Info("complete.")
 	return nil
 }
 
-func InstallDevTools(c *Config, verbose bool) error {
+func InstallDevTools(c *Config) error {
 	if c.distro != "debian" {
 		slog.Error("invalid operating system", "want", "debian", "have", c.distro)
 		return errors.New("invalid OS")
@@ -104,12 +107,12 @@ func InstallDevTools(c *Config, verbose bool) error {
 		cmd := exec.Command("sudo", c.packageManager, "install", "-y", dep)
 		cmdList = append(cmdList, *cmd)
 	}
-	for _, c := range cmdList {
-		slog.Info("installing dependency", "package", c.Args[4])
-		if verbose {
-			c.Stderr = os.Stderr
+	for _, cmd := range cmdList {
+		slog.Info("installing dependency", "package", cmd.Args[4])
+		if c.verbose {
+			cmd.Stderr = os.Stderr
 		}
-		if err := c.Run(); err != nil {
+		if err := cmd.Run(); err != nil {
 			return err
 		}
 	}
@@ -166,7 +169,7 @@ func installDockerDebian(c *Config) error {
 	if err := writeDockerAptSource(c); err != nil {
 		return err
 	}
-	if err := InstallDependencies(c, false); err != nil {
+	if err := InstallDependencies(c); err != nil {
 		return err
 	}
 	for _, dep := range deps.Docker {
