@@ -25,7 +25,7 @@ func loadDependencies() Dependencies {
 	return GetPackageList()
 }
 
-func InstallInitialDebianDependencies(c *Config) error {
+func InstallInitialDebianDependencies(c *Config, verbose bool) error {
 	// This needs to be run as root; check if user is root
 	slog.Info("installing initial dependencies for new debian system")
 	if c.currentUser != "root" {
@@ -42,8 +42,10 @@ func InstallInitialDebianDependencies(c *Config) error {
 	for _, dep := range deps.InitialDependencies {
 		slog.Info("installing dependency", "package", dep)
 		cmd := exec.Command(c.packageManager, "install", "-y", dep)
-		cmd.Stdout = os.Stdout
-		cmd.Stdin = os.Stdin
+		if verbose {
+			cmd.Stdout = os.Stdout
+			cmd.Stdin = os.Stdin
+		}
 		cmdList = append(cmdList, cmd)
 	}
 	for _, cmd := range cmdList {
@@ -66,22 +68,26 @@ func InstallInitialDebianDependencies(c *Config) error {
 	return nil
 }
 
-func InstallDependencies(c *Config) error {
+func InstallDependencies(c *Config, verbose bool) error {
 	slog.Info("installing updates")
-	cmd := exec.Command("sudo", c.packageManager, "update", "-y")
-	cmd.Stdin = os.Stdin
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
-	if c.verbose {
-		cmd.Stdout = os.Stdout
+	update := exec.Command("sudo", c.packageManager, "update")
+	if verbose {
+		update.Stdout = os.Stdout
+		update.Stderr = os.Stderr
+		update.Stdin = os.Stdin
 	}
-	if err := cmd.Start(); err != nil {
-		slog.Error("error running command", "error", err)
+	if err := update.Run(); err != nil {
+		slog.Error("error running update command", "error", err)
 		return err
 	}
-	if err := cmd.Wait(); err != nil {
-		slog.Error("error running command", "error", err)
-		return err
+	upgrade := exec.Command("sudo", c.packageManager, "upgrade", "-y")
+	if verbose {
+		upgrade.Stdout = os.Stdout
+		upgrade.Stderr = os.Stderr
+		upgrade.Stdin = os.Stdin
+	}
+	if err := upgrade.Run(); err != nil {
+		slog.Error("error running upgrade command", "error", err)
 	}
 	slog.Info("complete.")
 	return nil
@@ -160,7 +166,7 @@ func installDockerDebian(c *Config) error {
 	if err := writeDockerAptSource(c); err != nil {
 		return err
 	}
-	if err := InstallDependencies(c); err != nil {
+	if err := InstallDependencies(c, false); err != nil {
 		return err
 	}
 	for _, dep := range deps.Docker {
