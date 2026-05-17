@@ -24,14 +24,14 @@ func runTools(s string) error {
 	}
 	switch s {
 	case "0":
-		if err := pkg.InstallInitialDebianDependencies(cfg); err != nil {
+		if err := pkg.InstallInitialDebianDependencies(cfg, false); err != nil {
 			return err
 		}
 	case "1":
 		if err := pkg.UpdateEnvironmentFile(cfg); err != nil {
 			return err
 		}
-		if err := pkg.InstallDependencies(cfg); err != nil {
+		if err := pkg.InstallDependencies(cfg, true); err != nil {
 			return err
 		}
 	case "2":
