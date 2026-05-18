@@ -1,6 +1,7 @@
 package pkg
 
 import (
+	"io"
 	"log/slog"
 	"os"
 )
@@ -15,7 +16,48 @@ func GetPackageList() Dependencies {
 	return packages
 }
 
+func backupRC(c *Config) error {
+	slog.Info("backing up bashrc file")
+	originalFile := c.homeDiretory + "/" + ".bashrc"
+	backupFile := c.homeDiretory + "/" + ".bashrc.orig"
+	if _, err := os.Stat(backupFile); err == nil {
+		slog.Info("Backup file already exists")
+		source, err := os.Open(backupFile)
+		if err != nil {
+			slog.Error("error opening backup file")
+			return err
+		}
+		defer source.Close()
+
+		dest, err := os.Create(originalFile)
+		if err != nil {
+			slog.Error("error creating file")
+			return err
+		}
+		defer dest.Close()
+		if _, err := io.Copy(dest, source); err != nil {
+			slog.Error("error copying contents")
+			return err
+		}
+		return nil
+	}
+	contents, err := os.ReadFile(originalFile)
+	if err != nil {
+		slog.Error("error reading bashrc file")
+		return err
+	}
+	if err := os.WriteFile(backupFile, contents, 0644); err != nil {
+		slog.Error("error writing backup")
+		return err
+	}
+	slog.Info("backup successful", "location", backupFile)
+	return nil
+}
+
 func GenerateTemplates(c *Config) error {
+	if err := backupRC(c); err != nil {
+		return err
+	}
 	if err := generateBashRCTemplate(c.homeDiretory + "/" + ".bashrc"); err != nil {
 		return err
 	}

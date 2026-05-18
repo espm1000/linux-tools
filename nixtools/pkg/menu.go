@@ -31,6 +31,7 @@ func DisplayMenu() (string, error) {
 	fmt.Println(text.Line2)
 	fmt.Println(text.Line3)
 	fmt.Println(text.Line4)
+	fmt.Println(text.Line5)
 	fmt.Print("Selection: ")
 	if _, err := fmt.Scan(&selection); err != nil {
 		return "", err
