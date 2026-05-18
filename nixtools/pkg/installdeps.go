@@ -26,6 +26,10 @@ func loadDependencies() Dependencies {
 }
 
 func InstallInitialDebianDependencies(c *Config) error {
+	if c.distro != "debian" {
+		err := errors.New("unsupported operating system")
+		return err
+	}
 	// This needs to be run as root; check if user is root
 	slog.Info("installing initial dependencies for new debian system")
 	if c.currentUser != "root" {
