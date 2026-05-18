@@ -27,14 +27,22 @@ func backupRC(c *Config) error {
 			slog.Error("error opening backup file")
 			return err
 		}
-		defer source.Close()
-
+		defer func() {
+			if err := source.Close(); err != nil {
+				slog.Error("error closing stream")
+			}
+		}()
 		dest, err := os.Create(originalFile)
 		if err != nil {
 			slog.Error("error creating file")
 			return err
 		}
-		defer dest.Close()
+		defer func() {
+			if err := dest.Close(); err != nil {
+				slog.Error("error closing stream")
+			}
+		}()
+
 		if _, err := io.Copy(dest, source); err != nil {
 			slog.Error("error copying contents")
 			return err
