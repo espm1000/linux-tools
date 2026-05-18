@@ -5,7 +5,9 @@ WORKDIR /tools
 RUN go build -o tools.dev .
 
 FROM fedora:latest
-ENV NIX_VERBOSE $NIX_VERBOSE
+
+ARG NIX_VERBOSE
+ENV NIX_VERBOSE=$NIX_VERBOSE
 COPY --from=builder /tools/tools.dev /tools/tools.dev
 
 RUN useradd -m testuser
