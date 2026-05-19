@@ -31,6 +31,7 @@ type Config struct {
 }
 
 func GenerateConfig() (*Config, error) {
+	var verbose bool
 	cu, err := getCurrentUser()
 	if err != nil {
 		slog.Error("error getting user", "error", err)
@@ -64,6 +65,12 @@ func GenerateConfig() (*Config, error) {
 		return nil, err
 	}
 
+	if os.Getenv("NIX_VERBOSE") != "" {
+		verbose = true
+	} else {
+		verbose = false
+	}
+
 	return &Config{
 		currentUser:    cu,
 		hostname:       hostname,
@@ -71,7 +78,7 @@ func GenerateConfig() (*Config, error) {
 		os:             cfg.os,
 		distro:         cfg.distro,
 		packageManager: cfg.packageManager,
-		verbose:        false,
+		verbose:        verbose,
 		OSInfo: &OSInfo{
 			VersionInfo: version,
 			Arch:        strings.Replace(arch, "\n", "", 1),
@@ -86,10 +93,6 @@ func getCurrentUser() (string, error) {
 	if err != nil {
 		slog.Error("error reading local user", "error", err)
 		return "", err
-	}
-	// Check if running on local machine
-	if current_user.Username == "nick" {
-		return "", errors.New("current user indicates may be running locally")
 	}
 	slog.Info("detected username", "username", current_user.Username)
 	return current_user.Username, nil

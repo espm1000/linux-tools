@@ -7,3 +7,4 @@
 - [x] Install Dependencies
 - [x] Menu system
 - [x] Logging
+- [ ] Set up SSH keys

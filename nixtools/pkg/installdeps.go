@@ -15,35 +15,92 @@ const dockerKey string = "/etc/apt/keyrings/docker.asc"
 const dockerRepo string = "/etc/apt/sources.list.d/docker.sources"
 
 type Dependencies struct {
-	BasicDependencies []string `json:"basic_dependencies"`
-	Docker            []string `json:"docker"`
-	DebianDev         []string `json:"debian_dev"`
+	InitialDependencies []string
+	BasicDependencies   []string
+	Docker              []string
+	DebianDev           []string
 }
 
 func loadDependencies() Dependencies {
 	return GetPackageList()
 }
 
-func InstallAptDependencies(c *Config) error {
+func InstallInitialDebianDependencies(c *Config) error {
+	if c.distro != "debian" {
+		err := errors.New("unsupported operating system")
+		return err
+	}
+	// This needs to be run as root; check if user is root
+	slog.Info("installing initial dependencies for new debian system")
+	if c.currentUser != "root" {
+		slog.Error("user must be root")
+		return errors.New("user must be root")
+	}
+	var linuxUser string
+	var cmdList []*exec.Cmd
+	deps := loadDependencies()
+	slog.Info("refreshing package manager", "package_manager", c.packageManager)
+	if err := exec.Command(c.packageManager, "update").Run(); err != nil {
+		return err
+	}
+	for _, dep := range deps.InitialDependencies {
+		slog.Info("installing dependency", "package", dep)
+		cmd := exec.Command(c.packageManager, "install", "-y", dep)
+		if c.verbose {
+			cmd.Stdout = os.Stdout
+			cmd.Stdin = os.Stdin
+		}
+		cmdList = append(cmdList, cmd)
+	}
+	for _, cmd := range cmdList {
+		if err := cmd.Run(); err != nil {
+			slog.Error("error running install", "error", err)
+			return err
+		}
+	}
+	slog.Info("done")
+	fmt.Print("what is your linux username? ")
+	if _, err := fmt.Scan(&linuxUser); err != nil {
+		slog.Error("error capturing username")
+		return err
+	}
+	slog.Info("adding user to sudoers file", "user", linuxUser)
+	if _, err := exec.Command("sudo", "usermod", "-aG", "sudo", linuxUser).Output(); err != nil {
+		return err
+	}
+	slog.Info("done. reboot or relog into the workstation")
+	return nil
+}
+
+func InstallDependencies(c *Config) error {
 	slog.Info("installing updates")
-	cmd := exec.Command("sudo", c.packageManager, "update", "-y")
-	cmd.Stdin = os.Stdin
+	update := exec.Command("sudo", c.packageManager, "update", "-y")
 	if c.verbose {
-		cmd.Stdout = os.Stdout
+		update.Stdout = os.Stdout
+		update.Stderr = os.Stderr
+		update.Stdin = os.Stdin
 	}
-	if err := cmd.Start(); err != nil {
-		slog.Error("error running command", "error", err)
+	if err := update.Run(); err != nil {
+		slog.Error("error running update command", "error", err)
 		return err
 	}
-	if err := cmd.Wait(); err != nil {
-		slog.Error("error running command", "error", err)
-		return err
+	if c.packageManager == "apt" {
+		slog.Info("running apt upgrade command")
+		upgrade := exec.Command("sudo", c.packageManager, "upgrade", "-y")
+		if c.verbose {
+			upgrade.Stdout = os.Stdout
+			upgrade.Stderr = os.Stderr
+			upgrade.Stdin = os.Stdin
+		}
+		if err := upgrade.Run(); err != nil {
+			slog.Error("error running upgrade command", "error", err)
+		}
 	}
 	slog.Info("complete.")
 	return nil
 }
 
-func InstallDevTools(c *Config, verbose bool) error {
+func InstallDevTools(c *Config) error {
 	if c.distro != "debian" {
 		slog.Error("invalid operating system", "want", "debian", "have", c.distro)
 		return errors.New("invalid OS")
@@ -54,12 +111,12 @@ func InstallDevTools(c *Config, verbose bool) error {
 		cmd := exec.Command("sudo", c.packageManager, "install", "-y", dep)
 		cmdList = append(cmdList, *cmd)
 	}
-	for _, c := range cmdList {
-		slog.Info("installing dependency", "package", c.Args[4])
-		if verbose {
-			c.Stderr = os.Stderr
+	for _, cmd := range cmdList {
+		slog.Info("installing dependency", "package", cmd.Args[4])
+		if c.verbose {
+			cmd.Stderr = os.Stderr
 		}
-		if err := c.Run(); err != nil {
+		if err := cmd.Run(); err != nil {
 			return err
 		}
 	}
@@ -116,7 +173,7 @@ func installDockerDebian(c *Config) error {
 	if err := writeDockerAptSource(c); err != nil {
 		return err
 	}
-	if err := InstallAptDependencies(c); err != nil {
+	if err := InstallDependencies(c); err != nil {
 		return err
 	}
 	for _, dep := range deps.Docker {
@@ -130,6 +187,7 @@ func installDockerDebian(c *Config) error {
 			return err
 		}
 	}
+	slog.Info("docker installation complete. add user to docker group.")
 	return nil
 }
 

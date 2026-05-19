@@ -5,13 +5,12 @@ WORKDIR /tools
 RUN go build -o tools.dev .
 
 FROM debian:trixie-slim
-RUN apt update && apt install -y sudo
 
+ARG NIX_VERBOSE
+ENV NIX_VERBOSE=$NIX_VERBOSE
 COPY --from=builder /tools/tools.dev /tools/tools.dev
 
 RUN useradd -m testuser
-RUN usermod -aG sudo testuser
 RUN echo "testuser:p" | chpasswd
 
 WORKDIR /tools
-USER testuser

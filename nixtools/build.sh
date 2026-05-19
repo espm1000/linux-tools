@@ -65,7 +65,7 @@ function main() {
       buildTool
     ;;
     *)
-      echo "build tool"
+      echo -e "${RED}Option needed.${DEFAULT}"
     ;;
   esac
 }
