@@ -1,5 +1,21 @@
 # Changelog
 
+## [0.7.0](https://github.com/espm1000/linux-tools/compare/v0.6.0...v0.7.0) (2026-05-19)
+
+
+### Features
+
+* **debian:** add initial dependency installation and improve menu options ([#28](https://github.com/espm1000/linux-tools/issues/28)) ([9e9de44](https://github.com/espm1000/linux-tools/commit/9e9de44ee0850c56f3c00bdcb21721db4a701bad))
+* **installdeps:** implement function to install initial Debian dependencies ([9e9de44](https://github.com/espm1000/linux-tools/commit/9e9de44ee0850c56f3c00bdcb21721db4a701bad))
+* **Added verbose option
+
+### Bug Fixes
+
+* **audit:** remove local user check from getCurrentUser function ([9e9de44](https://github.com/espm1000/linux-tools/commit/9e9de44ee0850c56f3c00bdcb21721db4a701bad))
+* **Installs sudo as initial dependency (debian)
+* **No longer keeps appending to .bashrc file
+* **Handle adding user to sudoers file (debian)
+
 ## [0.6.0](https://github.com/espm1000/linux-tools/compare/v0.5.0...v0.6.0) (2026-05-11)
 
 
