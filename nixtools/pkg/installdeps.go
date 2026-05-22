@@ -40,7 +40,7 @@ func InstallInitialDebianDependencies(c *Config) error {
 	var cmdList []*exec.Cmd
 	deps := loadDependencies()
 	slog.Info("refreshing package manager", "package_manager", c.packageManager)
-	if err := exec.Command(c.packageManager, "update").Run(); err != nil {
+	if err := packageManagerUpdate(c); err != nil {
 		return err
 	}
 	for _, dep := range deps.InitialDependencies {
@@ -73,30 +73,12 @@ func InstallInitialDebianDependencies(c *Config) error {
 }
 
 func InstallDependencies(c *Config) error {
-	slog.Info("installing updates")
-	update := exec.Command("sudo", c.packageManager, "update", "-y")
-	if c.verbose {
-		update.Stdout = os.Stdout
-		update.Stderr = os.Stderr
-		update.Stdin = os.Stdin
-	}
-	if err := update.Run(); err != nil {
-		slog.Error("error running update command", "error", err)
+	if err := packageManagerUpdate(c); err != nil {
 		return err
 	}
-	if c.packageManager == "apt" {
-		slog.Info("running apt upgrade command")
-		upgrade := exec.Command("sudo", c.packageManager, "upgrade", "-y")
-		if c.verbose {
-			upgrade.Stdout = os.Stdout
-			upgrade.Stderr = os.Stderr
-			upgrade.Stdin = os.Stdin
-		}
-		if err := upgrade.Run(); err != nil {
-			slog.Error("error running upgrade command", "error", err)
-		}
+	if err := packageManagerUpgrade(c); err != nil {
+		return err
 	}
-	slog.Info("complete.")
 	return nil
 }
 
@@ -235,5 +217,48 @@ Signed-By: %s`
 		return err
 	}
 
+	return nil
+}
+
+func packageManagerUpdate(c *Config) error {
+	if c.currentUser == "root" {
+		slog.Info("installing updates as root")
+		update := exec.Command(c.packageManager, "update", "-y")
+		if err := update.Run(); err != nil {
+			return err
+		}
+		return nil
+	}
+	slog.Info("installing updates")
+	update := exec.Command("sudo", c.packageManager, "update", "-y")
+	if c.verbose {
+		update.Stdout = os.Stdout
+		update.Stderr = os.Stderr
+		update.Stdin = os.Stdin
+	}
+	if err := update.Run(); err != nil {
+		slog.Error("error running update command", "error", err)
+		return err
+	}
+	slog.Info("complete.")
+	return nil
+
+}
+
+func packageManagerUpgrade(c *Config) error {
+	if c.packageManager == "apt" {
+		slog.Info("running apt upgrade command")
+		upgrade := exec.Command("sudo", c.packageManager, "upgrade", "-y")
+		if c.verbose {
+			upgrade.Stdout = os.Stdout
+			upgrade.Stderr = os.Stderr
+			upgrade.Stdin = os.Stdin
+		}
+		if err := upgrade.Run(); err != nil {
+			slog.Error("error running upgrade command", "error", err)
+			return err
+		}
+	}
+	slog.Info("complete.")
 	return nil
 }
