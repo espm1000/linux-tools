@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/base64"
+	"encoding/json"
 	"fmt"
 	"log/slog"
 	"os/exec"
@@ -42,7 +43,12 @@ func (c Config) GetPodName() (string, error) {
 		slog.Error("error getting pod name", "error", err)
 		return "", err
 	}
-	return string(podName), nil
+	podName_s := string(podName)
+	podName_s, err = strconv.Unquote(podName_s)
+	if err != nil {
+		return "", err
+	}
+	return podName_s, nil
 }
 
 func (c Config) GetConfig() (*Config, error) {
@@ -55,21 +61,22 @@ func (c Config) GetConfig() (*Config, error) {
 		return nil, err
 	}
 	return &Config{
+		Namespace:            "default",
+		DeploymentName:       "grafana",
+		ServiceName:          "grafana",
 		DefaultAdminPassword: string(pass),
 		PodName:              podName,
+		Kpath:                "app.kubernetes.io/name=grafana,app.kubernetes.io/instance=grafana",
 	}, nil
 }
 
 func main() {
-	k := Config{
-		Namespace: "default",
-		Kpath:     "app.kubernetes.io/name=grafana,app.kubernetes.io/instance=grafana",
-	}
-	cfg, err := k.GetConfig()
+	cluster := Config{}
+	k, err := cluster.GetConfig()
 	if err != nil {
 		slog.Error("error occurred", "error", err)
 		panic(err)
 	}
-	fmt.Printf("admin password: %s\n", cfg.DefaultAdminPassword)
-	fmt.Printf("pod name: %s\n", cfg.PodName)
+	jsonData, _ := json.Marshal(k)
+	fmt.Println(string(jsonData))
 }
